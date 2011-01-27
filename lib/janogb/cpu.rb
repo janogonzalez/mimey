@@ -40,6 +40,22 @@ module JanoGB
       end
       
       @clock = 0
+      @mmu = MMU.new
+    end
+    
+    # Runs n steps
+    def run(n)
+      n.times do
+        opcode = @mmu[@pc]
+        @pc += 1
+        method(OPERATIONS[opcode]).call
+      end
+    end
+    
+    # Runs a program
+    def run_with(*args)
+      @mmu.load_rom(*args)
+      run(args.length)
     end
     
     # Gets the value of the "virtual" 16 bits AF register
