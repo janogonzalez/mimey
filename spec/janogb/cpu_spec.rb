@@ -11,9 +11,6 @@ describe "CPU" do
       [:a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
       end
-      
-      cpu.pc.should == 0x0000
-      cpu.sp.should == 0x0000
     end
     
     it "should initialize all registers with the options values" do
