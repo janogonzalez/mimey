@@ -33,6 +33,12 @@ describe "CPU" do
         cpu.instance_variable_get("@#{r}").should == options[r]
       end
     end
+    
+    it "should have its clock in 0" do
+      cpu = CPU.new()
+      
+      cpu.clock.should == 0
+    end
   end
   
   describe "16 bits 'virtual' registers" do
@@ -58,6 +64,64 @@ describe "CPU" do
       cpu = CPU.new(h: 0xAB, l: 0xCD)
       
       cpu.hl.should == 0xABCD
+    end
+  end
+  
+  describe "Flags from F register" do
+    describe "Z flag" do
+      it "should be false when its off" do
+        cpu = CPU.new(f: 0b0111_0000)
+      
+        cpu.z_flag.should be_false
+      end
+    
+      it "should be true when its on" do
+        cpu = CPU.new(f: 0b1000_0000)
+      
+        cpu.z_flag.should be_true
+      end
+    end
+    
+    describe "N flag" do
+      it "should be false when its off" do
+        cpu = CPU.new(f: 0b1011_0000)
+      
+        cpu.n_flag.should be_false
+      end
+    
+      it "should be true when its on" do
+        cpu = CPU.new(f: 0b0100_0000)
+      
+        cpu.n_flag.should be_true
+      end
+    end
+    
+    describe "H flag" do
+      it "should be false when its off" do
+        cpu = CPU.new(f: 0b1101_0000)
+
+        cpu.h_flag.should be_false
+      end
+
+      it "should be true when its on" do
+        cpu = CPU.new(f: 0b0010_0000)
+
+        cpu.h_flag.should be_true
+      end
+    end
+    
+    describe "C flag" do
+      it "should be false when its off" do
+        cpu = CPU.new(f: 0b1110_0000)
+      
+        cpu.c_flag.should be_false
+      end
+    
+      it "should be true when its on" do
+        cpu = CPU.new(f: 0b0001_0000)
+      
+        cpu.c_flag.should be_true
+      end
     end
   end
 end
