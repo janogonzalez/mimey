@@ -43,4 +43,22 @@ describe "MMU" do
     mmu[0xC000].should == 0xAB
     mmu[0xDDFF].should == 0xCD
   end
+  
+  it "should be able to load a ROM and read it" do
+    mmu = MMU.new
+    mmu.load_rom(0xAB, 0xCD)
+    
+    mmu[0x00].should == 0xAB
+    mmu[0x01].should == 0xCD
+    mmu[0x02].should be nil
+  end
+  
+  it "should not let a program to modify the ROM" do
+    mmu = MMU.new
+    mmu.load_rom(0xAB)
+    
+    mmu[0x00] = 0xCD
+    
+    mmu[0x00].should == 0xAB
+  end
 end

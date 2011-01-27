@@ -2,13 +2,15 @@ module JanoGB
   # his class represents the Game Boy MMU
   class MMU
     # Initializes the memory areas
-    def initialize
+    def initialize()
       @internal_memory = Array.new(8192, 0x00)
     end
-    
+
     # Reads a byte from to the different memory areas
     def [](i)
       case i
+      when 0x0000..0x7FFF
+        @rom[i]
       when 0xC000..0xDFFF, 0xE000..0xFDFF
         @internal_memory[i & 0x1FFF]
       end
@@ -20,6 +22,11 @@ module JanoGB
       when 0xC000..0xDFFF, 0xE000..0xFDFF
         @internal_memory[i & 0x1FFF] = n
       end
+    end
+    
+    # Loads a ROM
+    def load_rom(*args)
+      @rom = args
     end
   end
 end
