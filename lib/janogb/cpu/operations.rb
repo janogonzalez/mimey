@@ -23,9 +23,20 @@ module JanoGB
       end
     end
 
+    # INC RR operations. Increment RR register by 1. If current register value is 0xFFFF,
+    # it will be 0x0000 after method execution
+    [:bc, :de, :hl, :sp].each do |r|
+      method_name = "inc_#{r}"
+      define_method(method_name) do
+        value = send "#{r}"
+        send "#{r}=", (value + 1) & 0xFFFF
+        @clock += 2
+      end
+    end
+
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc
     ]
   end
 end

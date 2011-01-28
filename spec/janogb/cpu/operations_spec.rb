@@ -44,5 +44,33 @@ describe "CPU operations" do
     cpu.pc.should == 0x0001
     cpu.clock.should == 2
   end
+  
+  describe "INC RR operations" do
+    it "should increment a register" do
+      cpu = CPU.new
+      
+      cpu.load_with(0x03).run(1)
+      
+      [:a, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.bc.should == 0x0001
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
     
+    it "should let in 0x0000 a register with 0xFFFF" do
+      cpu = CPU.new(b:0xFF, c:0xFF)
+      
+      cpu.load_with(0x03).run(1)
+      
+      [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
 end
