@@ -293,4 +293,18 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+  
+  it "must have a LD (nn),SP operation with opcode 0x08 that loads the SP register into the memory" do
+    cpu = CPU.new(sp: 0xABCD)
+    
+    cpu.load_with(0x08, 0xCA, 0xFE).run(1)
+
+    [:a, :b, :f, :b, :c, :d, :e, :h, :l].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+    
+    cpu.mmu.word[0xCAFE].should == 0xABCD
+    cpu.pc.should == 0x0003
+    cpu.clock.should == 5
+  end
 end

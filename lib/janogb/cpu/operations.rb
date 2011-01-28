@@ -14,7 +14,8 @@ module JanoGB
       end
     end
     
-    # LD (RR), A operations. Loads the A register into the memory pointed by RR regiser
+    # LD (RR), A operations. Loads the A register into the
+    # 16 bit memory direction pointed by RR regiser
     [:bc, :de, :hl].each do |r|
       method_name = "ld_m#{r}_a"
       define_method(method_name) do
@@ -80,9 +81,15 @@ module JanoGB
       end
     end
     
+    # LD (NN),SP. Loads the 16 bits SP register into 16 bits memory direction NN
+    def ld_mnn_sp
+      @mmu.word[next_word] = sp
+      @clock += 5
+    end
+    
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp
     ]
   end
 end
