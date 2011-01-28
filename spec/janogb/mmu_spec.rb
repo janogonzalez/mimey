@@ -61,4 +61,22 @@ describe "MMU" do
     
     mmu[0x00].should == 0xAB
   end
+  
+  it "should be able to read a word (16 bits)" do
+    mmu = MMU.new
+    
+    mmu[0xC000] = 0xAB
+    mmu[0xC001] = 0xCD
+    
+    mmu.word[0xC000].should == 0xABCD
+  end
+  
+  it "should be able to write a word (16 bits)" do
+    mmu = MMU.new
+    
+    mmu.word[0xC000] = 0xABCD
+    
+    mmu[0xC000].should == 0xAB
+    mmu[0xC001].should == 0xCD
+  end
 end
