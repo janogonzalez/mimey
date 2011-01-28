@@ -58,6 +58,23 @@ module JanoGB
       run(args.length)
     end
     
+    # Loads a program
+    def load_with(*args)
+      @mmu.load_rom(*args)
+    end
+    
+    # Reads the next byte from memory and increments PC by 1
+    def next_byte
+      @pc += 1
+      @mmu[@pc - 1]
+    end
+    
+    # Reads the next word from memory and increments PC by 2
+    def next_word
+      @pc += 2
+      @mmu.word[@pc - 2]
+    end
+    
     # Gets the value of the "virtual" 16 bits AF register
     def af
       (@a << 8) + @f

@@ -160,4 +160,22 @@ describe "CPU" do
       end
     end
   end
+  
+  it "should be able to read the next byte from memory and increment the program counter" do
+    cpu = CPU.new
+    
+    cpu.load_with(0xAB)
+    
+    cpu.next_byte.should == 0xAB
+    cpu.pc.should == 1
+  end
+  
+  it "should be able to read the next word from memory and increment the program counter" do
+    cpu = CPU.new
+    
+    cpu.load_with(0xAB, 0xCD)
+    
+    cpu.next_word.should == 0xABCD
+    cpu.pc.should == 2
+  end
 end
