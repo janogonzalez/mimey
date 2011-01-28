@@ -46,11 +46,12 @@ describe "MMU" do
   
   it "should be able to load a ROM and read it" do
     mmu = MMU.new
-    mmu.load_rom(0xAB, 0xCD)
+    mmu.load_rom(0xAB, 0xCD, 0xDE)
     
     mmu[0x00].should == 0xAB
     mmu[0x01].should == 0xCD
-    mmu[0x02].should be nil
+    mmu[0x02].should == 0xDE
+    mmu[0x03].should be nil
   end
   
   it "should not let a program to modify the ROM" do

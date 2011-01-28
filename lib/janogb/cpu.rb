@@ -11,6 +11,8 @@ module JanoGB
     attr_accessor :sp
     # CPU Clock
     attr_accessor :clock
+    # MMU
+    attr_accessor :mmu
     
     # Default register values
     DEFAULTS = {
@@ -46,21 +48,15 @@ module JanoGB
     # Runs n steps
     def run(n)
       n.times do
-        opcode = @mmu[@pc]
-        @pc += 1
-        method(OPERATIONS[opcode]).call
+        operation = OPERATIONS[next_byte]
+        method(operation).call
       end
-    end
-    
-    # Runs a program
-    def run_with(*args)
-      @mmu.load_rom(*args)
-      run(args.length)
     end
     
     # Loads a program
     def load_with(*args)
       @mmu.load_rom(*args)
+      self
     end
     
     # Reads the next byte from memory and increments PC by 1
