@@ -4,13 +4,13 @@ module JanoGB
   # This class represents the Game Boy CPU, a modified Z80.
   class CPU    
     # 8 bit registers: A, F, B, C, D, E, H, L
-    attr_reader :a, :f, :b, :c, :d, :e, :h, :l
+    attr_accessor :a, :f, :b, :c, :d, :e, :h, :l
     # 16 bit PC register (Program counter)
-    attr_reader :pc
+    attr_accessor :pc
     # 16 bit SP register (Stack pointer)
-    attr_reader :sp
+    attr_accessor :sp
     # CPU Clock
-    attr_reader :clock
+    attr_accessor :clock
     
     # Default register values
     DEFAULTS = {
@@ -63,9 +63,21 @@ module JanoGB
       (@a << 8) + @f
     end
     
+    # Sets the value of the "virtual" 16 bits AF register
+    def af=(n)
+      @a = (n >> 8)
+      @f = n & 0xFF
+    end
+    
     # Gets the value of the "virtual" 16 bits BC register
     def bc
       (@b << 8) + @c
+    end
+    
+    # Sets the value of the "virtual" 16 bits BC register
+    def bc=(n)
+      @b = (n >> 8)
+      @c = n & 0xFF
     end
     
     # Gets the value of the "virtual" 16 bits DE register
@@ -73,9 +85,21 @@ module JanoGB
       (@d << 8) + @e
     end
     
+    # Sets the value of the "virtual" 16 bits DE register
+    def de=(n)
+      @d = (n >> 8)
+      @e = n & 0xFF
+    end
+    
     # Gets the value of the "virtual" 16 bits HL register
     def hl
       (@h << 8) + @l
+    end
+    
+    # Sets the value of the "virtual" 16 bits HL register
+    def hl=(n)
+      @h = (n >> 8)
+      @l = n & 0xFF
     end
     
     # Gets the Z flag from the F register

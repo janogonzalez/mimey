@@ -48,10 +48,28 @@ describe "CPU" do
       cpu.af.should == 0xABCD
     end
     
+    it "should set the 'virtual' AF register based on registers A and F" do
+      cpu = CPU.new
+      
+      cpu.af = 0xABCD
+      
+      cpu.a.should == 0xAB
+      cpu.f.should == 0xCD
+    end
+    
     it "should get the 'virtual' BC register based on registers B and C" do
       cpu = CPU.new(b: 0xAB, c: 0xCD)
       
       cpu.bc.should == 0xABCD
+    end
+    
+    it "should set the 'virtual' BC register based on registers C and B" do
+      cpu = CPU.new
+      
+      cpu.bc = 0xABCD
+      
+      cpu.b.should == 0xAB
+      cpu.c.should == 0xCD
     end
     
     it "should get the 'virtual' DE register based on registers D and E" do
@@ -60,10 +78,28 @@ describe "CPU" do
       cpu.de.should == 0xABCD
     end
     
+    it "should set the 'virtual' DE register based on registers D and E" do
+      cpu = CPU.new
+      
+      cpu.de = 0xABCD
+      
+      cpu.d.should == 0xAB
+      cpu.e.should == 0xCD
+    end
+    
     it "should get the 'virtual' HL register based on registers H and L" do
       cpu = CPU.new(h: 0xAB, l: 0xCD)
       
       cpu.hl.should == 0xABCD
+    end
+    
+    it "should set the 'virtual' HL register based on registers H and L" do
+      cpu = CPU.new
+      
+      cpu.hl = 0xABCD
+      
+      cpu.h.should == 0xAB
+      cpu.l.should == 0xCD
     end
   end
   
