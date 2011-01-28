@@ -257,10 +257,40 @@ describe "CPU operations" do
       
       cpu.load_with(0x05).run(1)
       
+      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
       cpu.z_flag.should be_true
       cpu.n_flag.should be_true
       cpu.h_flag.should be_false
       cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
+  
+  describe "LD R,n operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      [:ld_b_n, :ld_c_n, :ld_d_n, :ld_e_n, :ld_h_n, :ld_l_n, :ld_a_n].each do |m|
+        cpu.should respond_to m
+      end
+    end
+  
+    it "must load a 8 bit value into a 8 bit register" do
+      cpu = CPU.new
+    
+      cpu.load_with(0x06, 0xAB).run(1)
+    
+      [:a, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+    
+      cpu.b.should == 0xAB
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
     end
   end
 end

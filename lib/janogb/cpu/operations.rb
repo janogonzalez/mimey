@@ -70,10 +70,19 @@ module JanoGB
         @clock += 1
       end
     end
-
+    
+    # LD R,n operations. Loads a 8 bits value to a 8 bits register
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "ld_#{r}_n"
+      define_method(method_name) do
+        instance_variable_set "@#{r}", next_byte
+        @clock += 2
+      end
+    end
+    
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n
     ]
   end
 end
