@@ -171,4 +171,96 @@ describe "CPU operations" do
       cpu.c_flag.should be_true
     end
   end
+  
+  describe "DEC R operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      [:dec_b, :dec_c, :dec_d, :dec_e, :dec_h, :dec_l, :dec_a].each do |m|
+        cpu.should respond_to m
+      end
+    end
+    
+    it "should let the register in 0x00 and set Z and N flags if current value is 0x01" do
+      cpu = CPU.new(b: 0x01)
+      
+      cpu.load_with(0x05).run(1)
+      
+      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set N and H flags if current value is 0x10" do
+      cpu = CPU.new(b: 0x10)
+      
+      cpu.load_with(0x05).run(1)
+      
+      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.b.should == 0x0F
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set N flags if current value is 0xFF" do
+      cpu = CPU.new(b: 0xFF)
+      
+      cpu.load_with(0x05).run(1)
+      
+      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.b.should == 0xFE
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should let the register in 0xFF and set Z and H flags if current value is 0x00" do
+      cpu = CPU.new()
+      
+      cpu.load_with(0x05).run(1)
+      
+      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.b.should == 0xFF
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "must not affect the C flag" do
+      cpu = CPU.new(b: 0x01, f: 0b0001_0000)
+      
+      cpu.load_with(0x05).run(1)
+      
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_true
+    end
+  end
 end

@@ -51,10 +51,29 @@ module JanoGB
         @clock += 1
       end
     end
+    
+    # DEC B operations. Decrement R register by 1
+    # Sets Z flag if result is 0
+    # Sets N flag
+    # Sets H flag if no borrow from bit 4
+    # C flag is not affected
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "dec_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        new_value = (value - 1) & 0xFF
+        instance_variable_set "@#{r}", new_value
+        @f &= C_FLAG
+        @f |= N_FLAG
+        @f |= Z_FLAG  if new_value == 0x00
+        @f |= H_FLAG  if (new_value & 0x0F) == 0x0F
+        @clock += 1
+      end
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b
     ]
   end
 end
