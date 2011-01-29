@@ -49,7 +49,7 @@ describe "CPU operations" do
     it "must be 3" do
       cpu = CPU.new
       
-      opcodes = [0x02, 0x12, 0x22]
+      opcodes = [0x02, 0x12, 0x77]
       
       [:ld_mbc_a, :ld_mde_a, :ld_mhl_a].each_with_index do |m, i|
         cpu.should respond_to m
@@ -160,7 +160,7 @@ describe "CPU operations" do
     end
     
     it "should let the register in 0x00 and set Z and H flags if current value is 0xFF" do
-      cpu = CPU.new(b: 0xFF)
+      cpu = CPU.new(b:0xFF)
       
       cpu.load_with(0x04).step
       
@@ -202,7 +202,7 @@ describe "CPU operations" do
     end
     
     it "should let the register in 0x00 and set Z and N flags if current value is 0x01" do
-      cpu = CPU.new(b: 0x01)
+      cpu = CPU.new(b:0x01)
       
       cpu.load_with(0x05).step
       
@@ -219,7 +219,7 @@ describe "CPU operations" do
     end
     
     it "should set N and H flags if current value is 0x10" do
-      cpu = CPU.new(b: 0x10)
+      cpu = CPU.new(b:0x10)
       
       cpu.load_with(0x05).step
       
@@ -237,7 +237,7 @@ describe "CPU operations" do
     end
     
     it "should set N flags if current value is 0xFF" do
-      cpu = CPU.new(b: 0xFF)
+      cpu = CPU.new(b:0xFF)
       
       cpu.load_with(0x05).step
       
@@ -273,7 +273,7 @@ describe "CPU operations" do
     end
     
     it "must not affect the C flag" do
-      cpu = CPU.new(b: 0x01, f: 0b0001_0000)
+      cpu = CPU.new(b:0x01, f:0b0001_0000)
       
       cpu.load_with(0x05).step
       
@@ -319,7 +319,7 @@ describe "CPU operations" do
   end
   
   it "must have a LD (nn),SP operation with opcode 0x08 that loads the SP register into the memory" do
-    cpu = CPU.new(sp: 0xABCD)
+    cpu = CPU.new(sp:0xABCD)
     
     cpu.load_with(0x08, 0xCA, 0xFE).step
 
@@ -364,7 +364,7 @@ describe "CPU operations" do
     end
     
     it "should set H flag if current value is of the form 0xnFFF and the value to is not of the form 0xn000" do
-      cpu = CPU.new(b:0x00, c:0x01, h: 0x0F, l:0xFF)
+      cpu = CPU.new(b:0x00, c:0x01, h:0x0F, l:0xFF)
       
       cpu.load_with(0x09).step
       
@@ -382,7 +382,7 @@ describe "CPU operations" do
     end
     
     it "should not set H flag if current value is of the form 0xnFFF and the value to add is of the form 0xn000" do
-      cpu = CPU.new(b:0x10, c:0x00, h: 0x0F, l:0xFF)
+      cpu = CPU.new(b:0x10, c:0x00, h:0x0F, l:0xFF)
       
       cpu.load_with(0x09).step
       
@@ -400,7 +400,7 @@ describe "CPU operations" do
     end
     
     it "should set H and C flags if sum overflows" do
-      cpu = CPU.new(b:0x00, c:0x01, h: 0xFF, l:0xFF)
+      cpu = CPU.new(b:0x00, c:0x01, h:0xFF, l:0xFF)
       
       cpu.load_with(0x09).step
       
@@ -450,7 +450,7 @@ describe "CPU operations" do
     end
   
     it "must load the memory at address pointed by register RR into the A register" do
-      cpu = CPU.new(b: 0xCA, c:0xFE)
+      cpu = CPU.new(b:0xCA, c:0xFE)
       
       cpu.mmu[0xCAFE] = 0xAB
       cpu.load_with(0x0A).step
@@ -643,7 +643,7 @@ describe "CPU operations" do
     end
   
     it "must load the memory at address pointed by register HL into the register" do
-      cpu = CPU.new(h: 0xCA, l:0xFE)
+      cpu = CPU.new(h:0xCA, l:0xFE)
       
       cpu.mmu[0xCAFE] = 0xAB
       cpu.load_with(0x46).step
@@ -652,6 +652,36 @@ describe "CPU operations" do
         cpu.instance_variable_get("@#{r}").should == 0x00
       end
     
+      cpu.b.should == 0xAB
+      cpu.hl.should == 0xCAFE
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+  
+  describe "LD (HL),R operations" do
+    it "must be 6" do
+      cpu = CPU.new
+      
+      opcodes = [0x70, 0x71, 0x72, 0x73, 0x74, 0x75]
+      
+      [:ld_mhl_b, :ld_mhl_c, :ld_mhl_d, :ld_mhl_e, :ld_mhl_h, :ld_mhl_l].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+  
+    it "must load he register into the memory at address pointed by register HL" do
+      cpu = CPU.new(b:0xAB, h:0xCA, l:0xFE)
+
+      cpu.load_with(0x70).step
+    
+      [:a, :c, :f, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.mmu[0xCAFE].should == 0xAB
       cpu.b.should == 0xAB
       cpu.hl.should == 0xCAFE
       cpu.pc.should == 0x0001

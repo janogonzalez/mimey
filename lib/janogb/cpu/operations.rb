@@ -162,6 +162,16 @@ module JanoGB
         @clock += 2
       end
     end
+    
+    # LD (HL),R operations. Load a 8 bits register into the memory pointed by register HL 
+    [:b, :c, :d, :e, :h, :l].each do |r|
+      method_name = "ld_mhl_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        @mmu[hl] = value
+        @clock += 2
+      end
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -170,7 +180,7 @@ module JanoGB
       # 0x10
       :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
-      :_20, :ld_hl_nn, :ld_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :_2A, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
+      :_20, :ld_hl_nn, :_22, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :_2A, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
       # 0x30
       :_30, :ld_sp_nn, :_32, :inc_sp, :_34, :_35, :_36, :_37, :_38, :add_hl_sp, :_3A, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
       #0x40
@@ -180,7 +190,7 @@ module JanoGB
       #0x60
       :ld_h_b, :ld_h_c, :ld_h_d, :ld_h_e, :ld_h_h, :ld_h_l, :ld_h_mhl, :ld_h_a, :ld_l_b, :ld_l_c, :ld_l_d, :ld_l_e, :ld_l_h, :ld_l_l, :ld_l_mhl, :ld_l_a,
       #0x70
-      :_70, :_71, :_72, :_73, :_74, :_75, :_76, :_77, :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_mhl, :ld_a_a
+      :ld_mhl_b, :ld_mhl_c, :ld_mhl_d, :ld_mhl_e, :ld_mhl_h, :ld_mhl_l, :_76, :ld_mhl_a, :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_mhl, :ld_a_a
     ].freeze
   end
 end
