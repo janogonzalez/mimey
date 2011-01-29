@@ -440,10 +440,12 @@ describe "CPU operations" do
     it "must be 3" do
       cpu = CPU.new
       
-      # TODO verify opcodes
+      opcodes = [0x0A, 0x1A, 0x7E]
       
-      [:ld_a_mbc, :ld_a_mde, :ld_a_mhl].each do |m|
+      [:ld_a_mbc, :ld_a_mde, :ld_a_mhl].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
   
@@ -624,6 +626,36 @@ describe "CPU operations" do
       cpu.c.should == 0xAB
       cpu.pc.should == 0x0001
       cpu.clock.should == 1
+    end
+  end
+  
+  describe "LD R,(HL) operations" do
+    it "must be 6" do
+      cpu = CPU.new
+      
+      opcodes = [0x46, 0x4E, 0x56, 0x5E, 0x66, 0x6E]
+      
+      [:ld_b_mhl, :ld_c_mhl, :ld_d_mhl, :ld_e_mhl, :ld_h_mhl, :ld_l_mhl].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+  
+    it "must load the memory at address pointed by register HL into the register" do
+      cpu = CPU.new(h: 0xCA, l:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0xAB
+      cpu.load_with(0x46).step
+    
+      [:a, :c, :f, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+    
+      cpu.b.should == 0xAB
+      cpu.hl.should == 0xCAFE
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
     end
   end
 end
