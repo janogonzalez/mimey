@@ -123,11 +123,29 @@ module JanoGB
         @clock += 2
       end
     end
+    
+    # RLCA. Rotates to the left the A register, loads the bit 7 into the C flag
+    # Resets Z, N and H flags
+    def rlca
+      @f &= C_FLAG
+      @f |= C_FLAG  if (@a & 0x80) == 0x80
+      @a = ((@a << 1) | (@a >> 7)) & 0xFF
+      @clock += 1
+    end
+    
+    # RRCA. Rotates to the left the A register, loads the bit 0 into the C flag
+    # Resets Z, N and H flags
+    def rrca
+      @f &= C_FLAG
+      @f |= C_FLAG  if (@a & 0x01) == 0x01
+      @a = ((@a >> 1) | ((@a & 0x01) << 7)) & 0xFF
+      @clock += 1
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
       # 0x00
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, :_07, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc, :dec_bc, :inc_c, :dec_c, :ld_c_n, :_0F,
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, :rlca, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc, :dec_bc, :inc_c, :dec_c, :ld_c_n, :rrca,
       # 0x10
       :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :add_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
