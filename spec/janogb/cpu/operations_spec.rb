@@ -432,4 +432,41 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+  
+  describe "DEC RR operations" do
+    it "must be 4" do
+      cpu = CPU.new
+      
+      [:dec_bc, :dec_de, :dec_hl, :dec_sp].each do |m|
+        cpu.should respond_to m
+      end
+    end
+    
+    it "should decrement a register" do
+      cpu = CPU.new(b:0x00, c:0x01)
+      
+      cpu.load_with(0x0B).run(1)
+      
+      [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should let in 0xFFFF a register with 0x0000" do
+      cpu = CPU.new(b:0x00, c:0x00)
+      
+      cpu.load_with(0x0B).run(1)
+      
+      [:a, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.bc.should == 0xFFFF
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
 end
