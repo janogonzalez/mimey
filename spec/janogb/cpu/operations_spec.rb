@@ -318,8 +318,6 @@ describe "CPU operations" do
     end
   end
   
-  
-  
   it "must have a LD (nn),SP operation with opcode 0x08 that loads the SP register into the memory" do
     cpu = CPU.new(sp: 0xABCD)
     
@@ -577,6 +575,53 @@ describe "CPU operations" do
       cpu.n_flag.should be_false
       cpu.h_flag.should be_false
       cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
+  
+  describe "LD R,R operations" do
+    it "must be 49" do
+      cpu = CPU.new
+      
+      opcodes = [
+        0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47,
+        0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4F,
+        0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x57,
+        0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5F,
+        0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67,
+        0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6F,
+        0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7F,
+      ]
+      
+      operations = [
+        :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_a,
+        :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_a,
+        :ld_d_b, :ld_d_c, :ld_d_d, :ld_d_e, :ld_d_h, :ld_d_l, :ld_d_a,
+        :ld_e_b, :ld_e_c, :ld_e_d, :ld_e_e, :ld_e_h, :ld_e_l, :ld_e_a,
+        :ld_h_b, :ld_h_c, :ld_h_d, :ld_h_e, :ld_h_h, :ld_h_l, :ld_h_a,
+        :ld_l_b, :ld_l_c, :ld_l_d, :ld_l_e, :ld_l_h, :ld_l_l, :ld_l_a,
+        :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_a,
+      ]
+      
+      operations.each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+  
+    it "must load a 8 bit register into another 8 bit register" do
+      cpu = CPU.new(c:0xAB)
+    
+      cpu.load_with(0x41).step
+    
+      [:a, :f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+    
+      cpu.b.should == 0xAB
+      cpu.c.should == 0xAB
       cpu.pc.should == 0x0001
       cpu.clock.should == 1
     end
