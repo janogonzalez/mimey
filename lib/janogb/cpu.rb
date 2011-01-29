@@ -45,12 +45,10 @@ module JanoGB
       @mmu = MMU.new
     end
     
-    # Runs n steps
-    def run(n)
-      n.times do
-        operation = OPERATIONS[next_byte]
-        method(operation).call
-      end
+    # Executes next instruction
+    def step
+      operation = OPERATIONS[next_byte]
+      method(operation).call
     end
     
     # Loads a program

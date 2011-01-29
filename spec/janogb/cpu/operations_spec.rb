@@ -7,7 +7,7 @@ describe "CPU operations" do
   it "should have a NOP operation with opcode 0x00 that does nothing" do
     cpu = CPU.new
     
-    cpu.load_with(0x00).run(1)
+    cpu.load_with(0x00).step
 
     [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
@@ -33,7 +33,7 @@ describe "CPU operations" do
     it "must load a 16 bit value into a 16 bit register" do
       cpu = CPU.new
     
-      cpu.load_with(0x01, 0xAB, 0xCD).run(1)
+      cpu.load_with(0x01, 0xAB, 0xCD).step
     
       [:a, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -61,7 +61,7 @@ describe "CPU operations" do
     it "must load the A register into the memory at address pointed by register RR" do
       cpu = CPU.new(a:0xAB, b: 0xCA, c:0xFE)
     
-      cpu.load_with(0x02).run(1)
+      cpu.load_with(0x02).step
     
       [:f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -89,7 +89,7 @@ describe "CPU operations" do
     it "should increment a register" do
       cpu = CPU.new
       
-      cpu.load_with(0x03).run(1)
+      cpu.load_with(0x03).step
       
       [:a, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -103,7 +103,7 @@ describe "CPU operations" do
     it "should let in 0x0000 a register with 0xFFFF" do
       cpu = CPU.new(b:0xFF, c:0xFF)
       
-      cpu.load_with(0x03).run(1)
+      cpu.load_with(0x03).step
       
       [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -130,7 +130,7 @@ describe "CPU operations" do
     it "must increment register R by 1" do
       cpu = CPU.new
       
-      cpu.load_with(0x04).run(1)
+      cpu.load_with(0x04).step
       
       [:a, :c, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -144,7 +144,7 @@ describe "CPU operations" do
     it "should set H flag if current value is 0x0F" do
       cpu = CPU.new(b: 0x0F)
       
-      cpu.load_with(0x04).run(1)
+      cpu.load_with(0x04).step
       
       [:a, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -162,7 +162,7 @@ describe "CPU operations" do
     it "should let the register in 0x00 and set Z and H flags if current value is 0xFF" do
       cpu = CPU.new(b: 0xFF)
       
-      cpu.load_with(0x04).run(1)
+      cpu.load_with(0x04).step
       
       [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -179,7 +179,7 @@ describe "CPU operations" do
     it "must not affect the C flag" do
       cpu = CPU.new(f: 0b0001_0000)
       
-      cpu.load_with(0x04).run(1)
+      cpu.load_with(0x04).step
       
       cpu.z_flag.should be_false
       cpu.n_flag.should be_false
@@ -204,7 +204,7 @@ describe "CPU operations" do
     it "should let the register in 0x00 and set Z and N flags if current value is 0x01" do
       cpu = CPU.new(b: 0x01)
       
-      cpu.load_with(0x05).run(1)
+      cpu.load_with(0x05).step
       
       [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -221,7 +221,7 @@ describe "CPU operations" do
     it "should set N and H flags if current value is 0x10" do
       cpu = CPU.new(b: 0x10)
       
-      cpu.load_with(0x05).run(1)
+      cpu.load_with(0x05).step
       
       [:a, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -239,7 +239,7 @@ describe "CPU operations" do
     it "should set N flags if current value is 0xFF" do
       cpu = CPU.new(b: 0xFF)
       
-      cpu.load_with(0x05).run(1)
+      cpu.load_with(0x05).step
       
       [:a, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -257,7 +257,7 @@ describe "CPU operations" do
     it "should let the register in 0xFF and set Z and H flags if current value is 0x00" do
       cpu = CPU.new()
       
-      cpu.load_with(0x05).run(1)
+      cpu.load_with(0x05).step
       
       [:a, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -275,7 +275,7 @@ describe "CPU operations" do
     it "must not affect the C flag" do
       cpu = CPU.new(b: 0x01, f: 0b0001_0000)
       
-      cpu.load_with(0x05).run(1)
+      cpu.load_with(0x05).step
       
       [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -306,7 +306,7 @@ describe "CPU operations" do
     it "must load a 8 bit value into a 8 bit register" do
       cpu = CPU.new
     
-      cpu.load_with(0x06, 0xAB).run(1)
+      cpu.load_with(0x06, 0xAB).step
     
       [:a, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -321,7 +321,7 @@ describe "CPU operations" do
   it "must have a LD (nn),SP operation with opcode 0x08 that loads the SP register into the memory" do
     cpu = CPU.new(sp: 0xABCD)
     
-    cpu.load_with(0x08, 0xCA, 0xFE).run(1)
+    cpu.load_with(0x08, 0xCA, 0xFE).step
 
     [:a, :b, :f, :b, :c, :d, :e, :h, :l].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
@@ -348,7 +348,7 @@ describe "CPU operations" do
     it "must add to HL register the value of the RR register" do
       cpu = CPU.new(b:0xAC, c:0xDB, h:0x00, l:01)
       
-      cpu.load_with(0x09).run(1)
+      cpu.load_with(0x09).step
       
       [:a, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -366,7 +366,7 @@ describe "CPU operations" do
     it "should set H flag if current value is of the form 0xnFFF and the value to is not of the form 0xn000" do
       cpu = CPU.new(b:0x00, c:0x01, h: 0x0F, l:0xFF)
       
-      cpu.load_with(0x09).run(1)
+      cpu.load_with(0x09).step
       
       [:a, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -384,7 +384,7 @@ describe "CPU operations" do
     it "should not set H flag if current value is of the form 0xnFFF and the value to add is of the form 0xn000" do
       cpu = CPU.new(b:0x10, c:0x00, h: 0x0F, l:0xFF)
       
-      cpu.load_with(0x09).run(1)
+      cpu.load_with(0x09).step
       
       [:a, :f, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -402,7 +402,7 @@ describe "CPU operations" do
     it "should set H and C flags if sum overflows" do
       cpu = CPU.new(b:0x00, c:0x01, h: 0xFF, l:0xFF)
       
-      cpu.load_with(0x09).run(1)
+      cpu.load_with(0x09).step
       
       [:a, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -420,7 +420,7 @@ describe "CPU operations" do
     it "must not affect the Z flag" do
       cpu = CPU.new(b:0xAB, c:0xCD, f:0b1000_0000)
       
-      cpu.load_with(0x09).run(1)
+      cpu.load_with(0x09).step
       
       [:a, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -451,7 +451,7 @@ describe "CPU operations" do
       cpu = CPU.new(b: 0xCA, c:0xFE)
       
       cpu.mmu[0xCAFE] = 0xAB
-      cpu.load_with(0x0A).run(1)
+      cpu.load_with(0x0A).step
     
       [:f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -479,7 +479,7 @@ describe "CPU operations" do
     it "should decrement a register" do
       cpu = CPU.new(b:0x00, c:0x01)
       
-      cpu.load_with(0x0B).run(1)
+      cpu.load_with(0x0B).step
       
       [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
@@ -492,7 +492,7 @@ describe "CPU operations" do
     it "should let in 0xFFFF a register with 0x0000" do
       cpu = CPU.new(b:0x00, c:0x00)
       
-      cpu.load_with(0x0B).run(1)
+      cpu.load_with(0x0B).step
       
       [:a, :f, :d, :e, :h, :l, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00
