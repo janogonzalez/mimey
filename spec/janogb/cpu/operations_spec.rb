@@ -694,7 +694,7 @@ describe "CPU operations" do
     
     cpu.load_with(0x22).step
 
-    [:b, :f, :b, :c, :d, :e].each do |r|
+    [:b, :f, :b, :c, :d, :e, :sp].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
     end
     
@@ -711,7 +711,7 @@ describe "CPU operations" do
     cpu.mmu[0xCAFD] = 0xAB
     cpu.load_with(0x2A).step
 
-    [:b, :f, :b, :c, :d, :e].each do |r|
+    [:b, :f, :b, :c, :d, :e, :sp].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
     end
     
@@ -727,7 +727,7 @@ describe "CPU operations" do
     
     cpu.load_with(0x32).step
 
-    [:b, :f, :b, :c, :d, :e].each do |r|
+    [:b, :f, :b, :c, :d, :e, :sp].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
     end
     
@@ -744,7 +744,7 @@ describe "CPU operations" do
     cpu.mmu[0xCAFF] = 0xAB
     cpu.load_with(0x3A).step
 
-    [:b, :f, :b, :c, :d, :e].each do |r|
+    [:b, :f, :b, :c, :d, :e, :sp].each do |r|
       cpu.instance_variable_get("@#{r}").should == 0x00
     end
     
@@ -753,5 +753,20 @@ describe "CPU operations" do
     cpu.a.should == 0xAB
     cpu.pc.should == 0x0001
     cpu.clock.should == 2
+  end
+  
+  it "must have a LD (HL),n operation with opcode 0x36 that loads a 8 bit number into the memory pointed by HL" do
+    cpu = CPU.new(h:0xCA, l:0xFE)
+
+    cpu.load_with(0x36, 0xAB).step
+
+    [:a, :f, :b, :c, :d, :e, :sp].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+
+    cpu.mmu[0xCAFE].should == 0xAB
+    cpu.hl.should == 0xCAFE
+    cpu.pc.should == 0x0002
+    cpu.clock.should == 3
   end
 end

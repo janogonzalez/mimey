@@ -200,6 +200,12 @@ module JanoGB
       self.hl = (hl - 1) & 0xFFFF
       @clock += 2
     end
+    
+    # LD (HL),n. Loads a 8 bit number into the memory pointed by HL
+    def ld_mhl_n
+      @mmu[hl] = next_byte
+      @clock += 3
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -210,7 +216,7 @@ module JanoGB
       # 0x20
       :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
       # 0x30
-      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :_36, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
+      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
       #0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
       #0x50
