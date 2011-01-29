@@ -172,6 +172,34 @@ module JanoGB
         @clock += 2
       end
     end
+    
+    # LDI (HL),A. Loads the A register into the memory pointed by HL, and then increments HL
+    def ldi_mhl_a
+      @mmu[hl] = @a
+      self.hl = (hl + 1) & 0xFFFF
+      @clock += 2
+    end
+    
+    # LDI A,(HL). Loads the memory pointed by HL into the A register, and then increments HL
+    def ldi_a_mhl
+      @a = @mmu[hl]
+      self.hl = (hl + 1) & 0xFFFF
+      @clock += 2
+    end
+    
+    # LDD (HL),A. Loads the A register into the memory pointed by HL, and then decrements HL
+    def ldd_mhl_a
+      @mmu[hl] = @a
+      self.hl = (hl - 1) & 0xFFFF
+      @clock += 2
+    end
+    
+    # LDD A,(HL). Loads the memory pointed by HL into the A register, and then decrements HL
+    def ldd_a_mhl
+      @a = @mmu[hl]
+      self.hl = (hl - 1) & 0xFFFF
+      @clock += 2
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -180,9 +208,9 @@ module JanoGB
       # 0x10
       :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
-      :_20, :ld_hl_nn, :_22, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :_2A, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
+      :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
       # 0x30
-      :_30, :ld_sp_nn, :_32, :inc_sp, :_34, :_35, :_36, :_37, :_38, :add_hl_sp, :_3A, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
+      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :_36, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
       #0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
       #0x50

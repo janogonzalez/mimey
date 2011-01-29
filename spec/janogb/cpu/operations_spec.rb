@@ -688,4 +688,70 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+
+  it "must have a LDI (HL),A operation with opcode 0x22 that loads the A register into the memory pointed by HL, and then increments HL" do
+    cpu = CPU.new(a:0xAB, h:0xCA, l:0xFD)
+    
+    cpu.load_with(0x22).step
+
+    [:b, :f, :b, :c, :d, :e].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+    
+    cpu.mmu[0xCAFD].should == 0xAB
+    cpu.hl.should == 0xCAFE
+    cpu.a.should == 0xAB
+    cpu.pc.should == 0x0001
+    cpu.clock.should == 2
+  end
+  
+  it "must have a LDI A,(HL) operation with opcode 0x32 that loads the memory pointed by HL into the A register, and then increments HL" do
+    cpu = CPU.new(h:0xCA, l:0xFD)
+    
+    cpu.mmu[0xCAFD] = 0xAB
+    cpu.load_with(0x2A).step
+
+    [:b, :f, :b, :c, :d, :e].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+    
+    cpu.mmu[0xCAFD].should == 0xAB
+    cpu.hl.should == 0xCAFE
+    cpu.a.should == 0xAB
+    cpu.pc.should == 0x0001
+    cpu.clock.should == 2
+  end
+  
+  it "must have a LDD (HL),A operation with opcode 0x2A that loads the A register into the memory pointed by HL, and then decrements HL" do
+    cpu = CPU.new(a:0xAB, h:0xCA, l:0xFF)
+    
+    cpu.load_with(0x32).step
+
+    [:b, :f, :b, :c, :d, :e].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+    
+    cpu.mmu[0xCAFF].should == 0xAB
+    cpu.hl.should == 0xCAFE
+    cpu.a.should == 0xAB
+    cpu.pc.should == 0x0001
+    cpu.clock.should == 2
+  end
+  
+  it "must have a LDD A,(HL) operation with opcode 0x3A that loads the memory pointed by HL into the A register, and then decrements HL" do
+    cpu = CPU.new(h:0xCA, l:0xFF)
+    
+    cpu.mmu[0xCAFF] = 0xAB
+    cpu.load_with(0x3A).step
+
+    [:b, :f, :b, :c, :d, :e].each do |r|
+      cpu.instance_variable_get("@#{r}").should == 0x00
+    end
+    
+    cpu.mmu[0xCAFF].should == 0xAB
+    cpu.hl.should == 0xCAFE
+    cpu.a.should == 0xAB
+    cpu.pc.should == 0x0001
+    cpu.clock.should == 2
+  end
 end
