@@ -41,7 +41,7 @@ describe "CPU operations" do
     end
   end
   
-  describe "LD (RR), A operations" do
+  describe "LD (RR),A operations" do
     it "must be 3" do
       cpu = CPU.new
       
@@ -59,7 +59,7 @@ describe "CPU operations" do
         cpu.instance_variable_get("@#{r}").should == 0x00
       end
     
-      cpu.mmu[0xCAFE] = 0xAB
+      cpu.mmu[0xCAFE].should == 0xAB
       cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
@@ -403,6 +403,31 @@ describe "CPU operations" do
       cpu.n_flag.should be_false
       cpu.h_flag.should be_false
       cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+
+  describe "LD A,(RR) operations" do
+    it "must be 3" do
+      cpu = CPU.new
+      
+      [:ld_a_mbc, :ld_a_mde, :ld_a_mhl].each do |m|
+        cpu.should respond_to m
+      end
+    end
+  
+    it "must load the memory at address pointed by register RR into the A register" do
+      cpu = CPU.new(b: 0xCA, c:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0xAB
+      cpu.load_with(0x0A).run(1)
+    
+      [:f, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+    
+      cpu.a.should == 0xAB
       cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end

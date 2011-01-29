@@ -19,7 +19,8 @@ module JanoGB
     [:bc, :de, :hl].each do |r|
       method_name = "ld_m#{r}_a"
       define_method(method_name) do
-        @mmu[bc] = @a
+        address = send "#{r}"
+        @mmu[address] = @a
         @clock += 2
       end
     end
@@ -101,9 +102,20 @@ module JanoGB
       end
     end
     
+    # LD A,(RR) operations. Loads the 16 bit memory pointed by RR register
+    # into the A register
+    [:bc, :de, :hl].each do |r|
+      method_name = "ld_a_m#{r}"
+      define_method(method_name) do
+        address = send "#{r}"
+        @a = @mmu[address]
+        @clock += 2
+      end
+    end
+    
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp, :add_hl_bc
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc
     ]
   end
 end
