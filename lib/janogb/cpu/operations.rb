@@ -123,10 +123,13 @@ module JanoGB
         @clock += 2
       end
     end
-    
+
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc, :dec_bc
-    ]
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, :_07, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc, :dec_bc, :inc_c, :dec_c, :ld_c_n, :_0F,
+      :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :add_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
+      :_20, :ld_hl_nn, :ld_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :_2A, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
+      :_30, :ld_sp_nn, :_32, :inc_sp, :_34, :_35, :_36, :_37, :_38, :add_hl_sp, :_3A, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F
+    ].freeze
   end
 end

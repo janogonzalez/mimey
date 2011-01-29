@@ -21,8 +21,12 @@ describe "CPU operations" do
     it "must be 4" do
       cpu = CPU.new
       
-      [:ld_bc_nn, :ld_de_nn, :ld_hl_nn, :ld_sp_nn].each do |m|
+      opcodes = [0x01, 0x11, 0x21, 0x31]
+      
+      [:ld_bc_nn, :ld_de_nn, :ld_hl_nn, :ld_sp_nn].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
   
@@ -45,8 +49,12 @@ describe "CPU operations" do
     it "must be 3" do
       cpu = CPU.new
       
-      [:ld_mbc_a, :ld_mde_a, :ld_mhl_a].each do |m|
+      opcodes = [0x02, 0x12, 0x22]
+      
+      [:ld_mbc_a, :ld_mde_a, :ld_mhl_a].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
   
@@ -69,8 +77,12 @@ describe "CPU operations" do
     it "must be 4" do
       cpu = CPU.new
       
-      [:inc_bc, :inc_de, :inc_hl, :inc_sp].each do |m|
+      opcodes = [0x03, 0x13, 0x23, 0x33]
+      
+      [:inc_bc, :inc_de, :inc_hl, :inc_sp].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
     
@@ -106,8 +118,12 @@ describe "CPU operations" do
     it "must be 7" do
       cpu = CPU.new
       
-      [:inc_b, :inc_c, :inc_d, :inc_e, :inc_h, :inc_l, :inc_a].each do |m|
+      opcodes = [0x04, 0x0C, 0x14, 0x1C, 0x24, 0x2C, 0x3C]
+      
+      [:inc_b, :inc_c, :inc_d, :inc_e, :inc_h, :inc_l, :inc_a].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
     
@@ -176,8 +192,12 @@ describe "CPU operations" do
     it "must be 7" do
       cpu = CPU.new
       
-      [:dec_b, :dec_c, :dec_d, :dec_e, :dec_h, :dec_l, :dec_a].each do |m|
+      opcodes = [0x05, 0x0D, 0x15, 0x1D, 0x25, 0x2D, 0x3D]
+      
+      [:dec_b, :dec_c, :dec_d, :dec_e, :dec_h, :dec_l, :dec_a].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
     
@@ -274,8 +294,12 @@ describe "CPU operations" do
     it "must be 7" do
       cpu = CPU.new
       
-      [:ld_b_n, :ld_c_n, :ld_d_n, :ld_e_n, :ld_h_n, :ld_l_n, :ld_a_n].each do |m|
+      opcodes = [0x06, 0x0E, 0x16, 0x1E, 0x26, 0x2E, 0x3E]
+      
+      [:ld_b_n, :ld_c_n, :ld_d_n, :ld_e_n, :ld_h_n, :ld_l_n, :ld_a_n].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
   
@@ -312,8 +336,12 @@ describe "CPU operations" do
     it "must be 4" do
       cpu = CPU.new
       
-      [:add_hl_bc, :add_hl_de, :add_hl_hl, :add_hl_sp].each do |m|
+      opcodes = [0x09, 0x19, 0x29, 0x39]
+      
+      [:add_hl_bc, :add_hl_de, :add_hl_hl, :add_hl_sp].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
     
@@ -412,6 +440,8 @@ describe "CPU operations" do
     it "must be 3" do
       cpu = CPU.new
       
+      # TODO verify opcodes
+      
       [:ld_a_mbc, :ld_a_mde, :ld_a_mhl].each do |m|
         cpu.should respond_to m
       end
@@ -437,8 +467,12 @@ describe "CPU operations" do
     it "must be 4" do
       cpu = CPU.new
       
-      [:dec_bc, :dec_de, :dec_hl, :dec_sp].each do |m|
+      opcodes = [0x0B, 0x1B, 0x2B, 0x3B]
+      
+      [:dec_bc, :dec_de, :dec_hl, :dec_sp].each_with_index do |m, i|
         cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
       end
     end
     
