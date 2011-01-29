@@ -789,7 +789,7 @@ describe "CPU operations" do
       cpu.clock.should == 1
     end
     
-    it "should not affect the Z and C flags" do
+    it "should not affect the Z and C flags, and set N and H flags" do
       cpu = CPU.new(a:0b1010_1010, f:0b1001_0000)
 
       cpu.load_with(0x2F).step
@@ -802,6 +802,59 @@ describe "CPU operations" do
       cpu.z_flag.should be_true
       cpu.n_flag.should be_true
       cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
+  
+  describe "CCF" do
+    it "must set the C flag if its not" do
+      cpu = CPU.new(f:0b0000_0000)
+
+      cpu.load_with(0x3F).step
+
+      [:a, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "must reset the C flag if its set" do
+      cpu = CPU.new(f:0b0001_0000)
+
+      cpu.load_with(0x3F).step
+
+      [:a, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should not affect the Z flag, and reset N and H flags" do
+      cpu = CPU.new(f:0b1000_0000)
+
+      cpu.load_with(0x3F).step
+
+      [:a, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
       cpu.c_flag.should be_true
       cpu.pc.should == 0x0001
       cpu.clock.should == 1

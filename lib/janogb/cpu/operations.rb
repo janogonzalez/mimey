@@ -207,11 +207,22 @@ module JanoGB
       @clock += 3
     end
     
-    # Sets the A register into its complement
+    # CPL. Sets the A register into its complement, sets the H and N flags.
     def cpl
       @a = ~@a & 0xFF
-      @f &= (Z_FLAG + C_FLAG)
       @f |= (N_FLAG + H_FLAG)
+      @clock += 1
+    end
+    
+    # CCF. Sets the C flag into its complement, resets the H and N flags.
+    def ccf
+      if (@f & C_FLAG) == C_FLAG
+        @f &= Z_FLAG
+      else
+        @f &= Z_FLAG
+        @f |= C_FLAG
+      end
+      
       @clock += 1
     end
 
@@ -224,7 +235,7 @@ module JanoGB
       # 0x20
       :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
-      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
+      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
       #0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
       #0x50
