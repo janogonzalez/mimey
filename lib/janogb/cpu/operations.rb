@@ -87,9 +87,23 @@ module JanoGB
       @clock += 5
     end
     
+    # ADD HL,RR operations. Adds a 16 bits register to HL
+    [:bc, :de, :hl, :sp].each do |r|
+      method_name = "add_hl_#{r}"
+      define_method(method_name) do
+        to_add = send "#{r}"
+        sum = hl + to_add
+        @f &= Z_FLAG
+        @f |= H_FLAG  if (hl & 0x0FFF) + (to_add & 0x0FFF) > 0x0FFF
+        @f |= C_FLAG  if sum > 0xFFFF
+        self.hl = sum & 0xFFFF
+        @clock += 2
+      end
+    end
+    
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
-      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp
+      :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, nil, :ld_mnn_sp, :add_hl_bc
     ]
   end
 end

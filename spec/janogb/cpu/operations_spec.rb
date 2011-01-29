@@ -307,4 +307,104 @@ describe "CPU operations" do
     cpu.pc.should == 0x0003
     cpu.clock.should == 5
   end
+  
+  describe "ADD HL,RR operations" do
+    it "must be 4" do
+      cpu = CPU.new
+      
+      [:add_hl_bc, :add_hl_de, :add_hl_hl, :add_hl_sp].each do |m|
+        cpu.should respond_to m
+      end
+    end
+    
+    it "must add to HL register the value of the RR register" do
+      cpu = CPU.new(b:0xAC, c:0xDB, h:0x00, l:01)
+      
+      cpu.load_with(0x09).run(1)
+      
+      [:a, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.hl.should == 0xACDC
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set H flag if current value is of the form 0xnFFF and the value to is not of the form 0xn000" do
+      cpu = CPU.new(b:0x00, c:0x01, h: 0x0F, l:0xFF)
+      
+      cpu.load_with(0x09).run(1)
+      
+      [:a, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.hl.should == 0x1000
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should not set H flag if current value is of the form 0xnFFF and the value to add is of the form 0xn000" do
+      cpu = CPU.new(b:0x10, c:0x00, h: 0x0F, l:0xFF)
+      
+      cpu.load_with(0x09).run(1)
+      
+      [:a, :f, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.hl.should == 0x1FFF
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set H and C flags if sum overflows" do
+      cpu = CPU.new(b:0x00, c:0x01, h: 0xFF, l:0xFF)
+      
+      cpu.load_with(0x09).run(1)
+      
+      [:a, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.hl.should == 0x0000
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "must not affect the Z flag" do
+      cpu = CPU.new(b:0xAB, c:0xCD, f:0b1000_0000)
+      
+      cpu.load_with(0x09).run(1)
+      
+      [:a, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.hl.should == 0xABCD
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
 end
