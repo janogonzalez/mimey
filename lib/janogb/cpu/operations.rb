@@ -216,13 +216,9 @@ module JanoGB
     
     # CCF. Sets the C flag into its complement, resets the H and N flags.
     def ccf
-      if (@f & C_FLAG) == C_FLAG
-        @f &= Z_FLAG
-      else
-        @f &= Z_FLAG
-        @f |= C_FLAG
-      end
-      
+      val = @f
+      @f &= Z_FLAG
+      @f |= C_FLAG  unless (val & C_FLAG) == C_FLAG
       @clock += 1
     end
 
