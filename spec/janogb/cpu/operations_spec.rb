@@ -844,9 +844,45 @@ describe "CPU operations" do
     end
     
     it "should not affect the Z flag, and reset N and H flags" do
-      cpu = CPU.new(f:0b1000_0000)
+      cpu = CPU.new(f:0b1110_0000)
 
       cpu.load_with(0x3F).step
+
+      [:a, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
+  
+  describe "SCF" do
+    it "must set the C flag" do
+      cpu = CPU.new(f:0b0000_0000)
+
+      cpu.load_with(0x37).step
+
+      [:a, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+
+    it "should not affect the Z flag, and reset N and H flags" do
+      cpu = CPU.new(f:0b1111_0000)
+
+      cpu.load_with(0x37).step
 
       [:a, :b, :c, :d, :e, :sp].each do |r|
         cpu.instance_variable_get("@#{r}").should == 0x00

@@ -221,6 +221,13 @@ module JanoGB
       @f |= C_FLAG  unless (val & C_FLAG) == C_FLAG
       @clock += 1
     end
+    
+    # CCF. Sets the C flag, resets the H and N flags.
+    def scf
+      @f &= Z_FLAG
+      @f |= C_FLAG
+      @clock += 1
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -231,7 +238,7 @@ module JanoGB
       # 0x20
       :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
-      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
+      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :scf, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
       #0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
       #0x50
