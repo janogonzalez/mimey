@@ -769,4 +769,42 @@ describe "CPU operations" do
     cpu.pc.should == 0x0002
     cpu.clock.should == 3
   end
+  
+  describe "CPL" do
+    it "must set the A register into its complement" do
+      cpu = CPU.new(a:0b1010_1010)
+
+      cpu.load_with(0x2F).step
+
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0101_0101
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should not affect the Z and C flags" do
+      cpu = CPU.new(a:0b1010_1010, f:0b1001_0000)
+
+      cpu.load_with(0x2F).step
+
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0101_0101
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
 end

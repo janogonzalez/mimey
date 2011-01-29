@@ -206,6 +206,14 @@ module JanoGB
       @mmu[hl] = next_byte
       @clock += 3
     end
+    
+    # Sets the A register into its complement
+    def cpl
+      @a = ~@a & 0xFF
+      @f &= (Z_FLAG + C_FLAG)
+      @f |= (N_FLAG + H_FLAG)
+      @clock += 1
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -214,7 +222,7 @@ module JanoGB
       # 0x10
       :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
-      :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :_2F,
+      :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
       :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :_37, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :_3F,
       #0x40
