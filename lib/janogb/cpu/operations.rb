@@ -239,14 +239,30 @@ module JanoGB
       :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
       :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :scf, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
-      #0x40
+      # 0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
-      #0x50
+      # 0x50
        :ld_d_b, :ld_d_c, :ld_d_d, :ld_d_e, :ld_d_h, :ld_d_l, :ld_d_mhl, :ld_d_a, :ld_e_b, :ld_e_c, :ld_e_d, :ld_e_e, :ld_e_h, :ld_e_l, :ld_e_mhl, :ld_e_a,
-      #0x60
+      # 0x60
       :ld_h_b, :ld_h_c, :ld_h_d, :ld_h_e, :ld_h_h, :ld_h_l, :ld_h_mhl, :ld_h_a, :ld_l_b, :ld_l_c, :ld_l_d, :ld_l_e, :ld_l_h, :ld_l_l, :ld_l_mhl, :ld_l_a,
-      #0x70
-      :ld_mhl_b, :ld_mhl_c, :ld_mhl_d, :ld_mhl_e, :ld_mhl_h, :ld_mhl_l, :_76, :ld_mhl_a, :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_mhl, :ld_a_a
+      # 0x70
+      :ld_mhl_b, :ld_mhl_c, :ld_mhl_d, :ld_mhl_e, :ld_mhl_h, :ld_mhl_l, :_76, :ld_mhl_a, :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_mhl, :ld_a_a,
+      # 0x80
+      :_80, :_81, :_82, :_83, :_84, :_85, :_86, :_87, :_88, :_89, :_8A, :_8B, :_8C, :_8D, :_8E, :_8F,
+      # 0x90
+      :_90, :_91, :_92, :_93, :_94, :_95, :_96, :_97, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
+      # 0xA0
+      :_A0, :_A1, :_A2, :_A3, :_A4, :_A5, :_A6, :_A7, :_A8, :_A9, :_AA, :_AB, :_AC, :_AD, :_AE, :_AF,
+      # 0xB0
+      :_B0, :_B1, :_B2, :_B3, :_B4, :_B5, :_B6, :_B7, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
+      # 0xC0
+      :_C0, :_C1, :_C2, :_C3, :_C4, :_C5, :_C6, :_C7, :_C8, :_C9, :_CA, :_CB, :_CC, :_CD, :_CE, :_CF,
+      # 0xD0
+      :_D0, :_D1, :_D2, :_D3, :_D4, :_D5, :_D6, :_D7, :_D8, :_D9, :_DA, :_DB, :_DC, :_DD, :_DE, :_DF,
+      # 0xE0
+      :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :_E6, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :_EE, :_EF,
+      # 0xF0
+      :_F0, :_F1, :_F2, :_F3, :_F4, :_F5, :_F6, :_F7, :_F8, :_F9, :_FA, :_FB, :_FC, :_FD, :_FE, :_FF
     ].freeze
   end
 end
