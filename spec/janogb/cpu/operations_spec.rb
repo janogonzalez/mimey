@@ -1766,4 +1766,136 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+  
+  describe "OR R operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      opcodes = [0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB7]
+      
+      [:or_b, :or_c, :or_d, :or_e, :or_h, :or_l, :or_a].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+    
+    it "should do a logical OR between A and a 8 bits register and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000, b:0b1010_1010)
+      
+      cpu.load_with(0xB0).step
+      
+      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b1111_1010
+      cpu.b.should == 0b1010_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0000_0000, b:0b0000_0000)
+
+      cpu.load_with(0xB0).step
+
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.b.should == 0b0000_0000
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end  
+  end
+  
+  describe "OR (HL)" do
+    it "should do a logical OR between A and the memory pointed by the HL register and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000, h:0xCA, l:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0b1010_1010
+      cpu.load_with(0xB6).step
+      
+      [:f, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b1111_1010
+      cpu.mmu[0xCAFE].should == 0b1010_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0000_0000, h:0xCA, l:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0b0000_0000
+      cpu.load_with(0xB6).step
+
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.mmu[0xCAFE].should == 0b0000_0000
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+  
+  describe "OR N" do
+    it "should do a logical or between A and a 8 bit value and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000)
+
+      cpu.load_with(0xF6, 0b1010_1010).step
+      
+      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b1111_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0000_0000)
+      
+      cpu.load_with(0xF6, 0b0000_0000).step
+
+      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
+    end
+  end
 end

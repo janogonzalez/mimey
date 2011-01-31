@@ -385,6 +385,43 @@ module JanoGB
       @f = 0x00
       @f |= Z_FLAG  if @a == 0x00
     end
+    
+    # OR R operations. Do a logical OR between A and a 8 bits register and set the result in A
+    # Set Z flag if result is 0
+    # Reset N, H and C flags
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "or_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        or_to_a value
+        @clock += 1
+      end
+    end
+    
+    # OR (HL). Does a logical OR between A and the memory pointed by the HL register and set the result in A
+    # Sets Z flag if result is 0
+    # Resets N, H and C flags
+    def or_mhl
+      value = @mmu[hl]
+      or_to_a value
+      @clock += 2
+    end
+    
+    # OR N. Does a logical OR between A and a 8 bit value and set the result in A
+    # Sets Z flag if result is 0
+    # Resets N, H and C flags
+    def or_n
+      value = next_byte
+      or_to_a value
+      @clock += 2
+    end
+    
+    # Does a logical XOR to the A register
+    def or_to_a(to_or)
+      @a |= to_or
+      @f = 0x00
+      @f |= Z_FLAG  if @a == 0x00
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -411,7 +448,7 @@ module JanoGB
       # 0xA0
       :and_b, :and_c, :and_d, :and_e, :and_h, :and_l, :and_mhl, :and_a, :xor_b, :xor_c, :xor_d, :xor_e, :xor_h, :xor_l, :xor_mhl, :xor_a,
       # 0xB0
-      :_B0, :_B1, :_B2, :_B3, :_B4, :_B5, :_B6, :_B7, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
+      :or_b, :or_c, :or_d, :or_e, :or_h, :or_l, :or_mhl, :or_a, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
       # 0xC0
       :_C0, :_C1, :_C2, :_C3, :_C4, :_C5, :add_a_n, :_C7, :_C8, :_C9, :_CA, :_CB, :_CC, :_CD, :adc_a_n, :_CF,
       # 0xD0
@@ -419,7 +456,7 @@ module JanoGB
       # 0xE0
       :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :and_n, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :xor_n, :_EF,
       # 0xF0
-      :_F0, :_F1, :_F2, :_F3, :_F4, :_F5, :_F6, :_F7, :_F8, :_F9, :_FA, :_FB, :_FC, :_FD, :_FE, :_FF
+      :_F0, :_F1, :_F2, :_F3, :_F4, :_F5, :or_n, :_F7, :_F8, :_F9, :_FA, :_FB, :_FC, :_FD, :_FE, :_FF
     ].freeze
   end
 end
