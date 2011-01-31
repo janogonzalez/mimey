@@ -897,7 +897,7 @@ describe "CPU operations" do
     end
   end
   
-  describe "ADD R,R operations" do
+  describe "ADD A,R operations" do
     it "must be 7" do
       cpu = CPU.new
       
@@ -1099,6 +1099,217 @@ describe "CPU operations" do
       
       cpu.a.should == 0x00
       cpu.mmu[0xCAFE].should == 0x01
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+  
+  describe "ADC A,R operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      opcodes = [0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8F]
+      
+      [:adc_a_b, :adc_a_c, :adc_a_d, :adc_a_e, :adc_a_h, :adc_a_l, :adc_a_a].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+    
+    it "must add a register and the carry flag to the A register" do
+      cpu = CPU.new(b:0xAB, f:CPU::C_FLAG)
+      
+      cpu.load_with(0x88).step
+      
+      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0xAC
+      cpu.b.should == 0xAB
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set H flag if current value is of the form 0xnF and the value to add is not of the form 0xn0" do
+      cpu = CPU.new(a:0x1F, f:CPU::C_FLAG)
+      
+      cpu.load_with(0x88).step
+      
+      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x20
+      cpu.b.should == 0x00
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should not set H flag if current value is of the form 0xnF and the value to add is of the form 0xn0" do
+      cpu = CPU.new(a:0x1F, b:0x0F, f:CPU::C_FLAG)
+      
+      cpu.load_with(0x88).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x2F
+      cpu.b.should == 0x0F
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set H and C flags if sum overflows" do
+      cpu = CPU.new(a:0xFF, b:0x01, f:CPU::C_FLAG)
+
+      cpu.load_with(0x88).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x01
+      cpu.b.should == 0x01
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "must set the Z flag if the result is 0" do
+      cpu = CPU.new(a:0xFF, f:CPU::C_FLAG)
+
+      cpu.load_with(0x88).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x00
+      cpu.b.should == 0x00
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
+  
+  describe "ADC A,(HL)" do
+    it "must add the memory pointed by the HL register to the A register" do
+      cpu = CPU.new(h:0xCA, l:0xFE, f:CPU::C_FLAG)
+      
+      cpu.mmu[0xCAFE] = 0xAB
+      cpu.load_with(0x8E).step
+      
+      [:f, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0xAC
+      cpu.mmu[0xCAFE].should == 0xAB
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set H flag if current value is of the form 0xnF and the value to add is not of the form 0xn0" do
+      cpu = CPU.new(a:0x1F, h:0xCA, l:0xFE, f:CPU::C_FLAG)
+      
+      cpu.mmu[0xCAFE] = 0x00
+      cpu.load_with(0x8E).step
+      
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x20
+      cpu.mmu[0xCAFE].should == 0x00
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should not set H flag if current value is of the form 0xnF and the value to add is of the form 0xn0" do
+      cpu = CPU.new(a:0x1F, h:0xCA, l:0xFE, f:CPU::C_FLAG)
+      
+      cpu.mmu[0xCAFE] = 0x0F
+      cpu.load_with(0x8E).step
+      
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x2F
+      cpu.mmu[0xCAFE].should == 0x0F
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set H and C flags if sum overflows" do
+      cpu = CPU.new(a:0xFF, h:0xCA, l:0xFE, f:CPU::C_FLAG)
+      
+      cpu.mmu[0xCAFE] = 0x01
+      cpu.load_with(0x8E).step
+      
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x01
+      cpu.mmu[0xCAFE].should == 0x01
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "must set the Z flag if the result is 0" do
+      cpu = CPU.new(a:0xFF, h:0xCA, l:0xFE, f:CPU::C_FLAG)
+      
+      cpu.mmu[0xCAFE] = 0x00
+      cpu.load_with(0x8E).step
+      
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x00
+      cpu.mmu[0xCAFE].should == 0x00
       cpu.z_flag.should be_true
       cpu.n_flag.should be_false
       cpu.h_flag.should be_true
