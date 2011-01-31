@@ -1898,4 +1898,32 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+  
+  describe "JR n" do
+    it "should add n to current address and jump to it" do
+      cpu = CPU.new(pc:0x02)
+      
+      cpu.load_with(0x00, 0x00, 0x18, 0b0000_0010).step
+      
+      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.pc.should == 0x05
+      cpu.clock.should == 3
+    end
+    
+    it "should jump back if n is negative" do
+      cpu = CPU.new(pc:0x02)
+      
+      cpu.load_with(0x00, 0x00, 0x18, 0b1111_1101).step
+      
+      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.pc.should == 0x00
+      cpu.clock.should == 3
+    end
+  end 
 end

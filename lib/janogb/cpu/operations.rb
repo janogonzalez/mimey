@@ -422,13 +422,24 @@ module JanoGB
       @f = 0x00
       @f |= Z_FLAG  if @a == 0x00
     end
+    
+    # JR n. Adds N (signed 8 bit number) to current address and jumps to it
+    def jr_n
+      @pc += as_signed_byte(next_byte)
+      @clock += 3
+    end
+    
+    # Returns the value as a signed byte
+    def as_signed_byte(value)
+      [ value ].pack("c").unpack("c").first
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
       # 0x00
       :nop, :ld_bc_nn, :ld_mbc_a, :inc_bc, :inc_b, :dec_b, :ld_b_n, :rlca, :ld_mnn_sp, :add_hl_bc, :ld_a_mbc, :dec_bc, :inc_c, :dec_c, :ld_c_n, :rrca,
       # 0x10
-      :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :_18, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
+      :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :jr_n, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
       :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
