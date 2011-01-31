@@ -36,7 +36,7 @@ module JanoGB
       end
     end
     
-    # INC B operations. Increment R register by 1
+    # INC R operations. Increment R register by 1
     # Sets Z flag if result is 0
     # Resets N flag
     # Sets H flag if carry from bit 3
@@ -228,6 +228,41 @@ module JanoGB
       @f |= C_FLAG
       @clock += 1
     end
+    
+    # ADD A,R operations. Add R 8 bits register to 8 bits A register
+    # Set Z flag if result is 0
+    # Reset N flag
+    # Set H flag if carry from bit 3
+    # Set C flag if carry from bit 7
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "add_a_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        add_to_a value
+        @clock += 1
+      end
+    end
+    
+    # ADD A,(HL). Add memory pointed by HL register to 8 bits A register
+    # Set Z flag if result is 0
+    # Reset N flag
+    # Set H flag if carry from bit 3
+    # Set C flag if carry from bit 7
+    def add_a_mhl
+      value = @mmu[hl]
+      add_to_a value
+      @clock += 2
+    end
+    
+    # Adds a value to the A register
+    def add_to_a(to_add)
+      sum = @a + to_add
+      @f = 0x00
+      @f |= Z_FLAG  if sum & 0xFF == 0x00
+      @f |= H_FLAG  if (@a & 0x0F) + (to_add & 0x0F) > 0x0F
+      @f |= C_FLAG  if sum > 0xFF
+      @a = sum & 0xFF
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -248,7 +283,7 @@ module JanoGB
       # 0x70
       :ld_mhl_b, :ld_mhl_c, :ld_mhl_d, :ld_mhl_e, :ld_mhl_h, :ld_mhl_l, :_76, :ld_mhl_a, :ld_a_b, :ld_a_c, :ld_a_d, :ld_a_e, :ld_a_h, :ld_a_l, :ld_a_mhl, :ld_a_a,
       # 0x80
-      :_80, :_81, :_82, :_83, :_84, :_85, :_86, :_87, :_88, :_89, :_8A, :_8B, :_8C, :_8D, :_8E, :_8F,
+      :add_a_b, :add_a_c, :add_a_d, :add_a_e, :add_a_h, :add_a_l, :add_a_mhl, :add_a_a, :_88, :_89, :_8A, :_8B, :_8C, :_8D, :_8E, :_8F,
       # 0x90
       :_90, :_91, :_92, :_93, :_94, :_95, :_96, :_97, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
       # 0xA0
