@@ -1,7 +1,7 @@
 require 'rspec'
 require 'janogb'
 
-describe "CPU LD operations" do
+describe "CPU load operations" do
   include JanoGB
   
   describe "LD RR,nn operations" do

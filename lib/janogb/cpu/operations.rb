@@ -1,4 +1,5 @@
 require 'janogb/cpu/operations/alu'
+require 'janogb/cpu/operations/bit'
 require 'janogb/cpu/operations/jump'
 require 'janogb/cpu/operations/load'
 

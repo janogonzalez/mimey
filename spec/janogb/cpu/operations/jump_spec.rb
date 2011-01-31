@@ -1,7 +1,7 @@
 require 'rspec'
 require 'janogb'
 
-describe "CPU operations" do
+describe "CPU jump operations" do
   include JanoGB
   
   describe "JR n" do
