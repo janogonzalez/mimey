@@ -317,18 +317,27 @@ module JanoGB
     [:b, :c, :d, :e, :h, :l, :a].each do |r|
       method_name = "and_#{r}"
       define_method(method_name) do
-        to_and = instance_variable_get "@#{r}"
-        and_to_a to_and
+        value = instance_variable_get "@#{r}"
+        and_to_a value
         @clock += 1
       end
     end
     
-    # AND (HL) operations. Does a logical and between A and a 8 bits value and set the result in A
+    # AND (HL). Does a logical and between A and the memory pointed by the HL register and set the result in A
     # Set Z flag if result is 0
     # Reset N and C flags, Set H flag
     def and_mhl
-      to_and = @mmu[hl]
-      and_to_a to_and
+      value = @mmu[hl]
+      and_to_a value
+      @clock += 2
+    end
+    
+    # AND N. Does a logical and between A and a 8 bit value and set the result in A
+    # Set Z flag if result is 0
+    # Reset N and C flags, Set H flag
+    def and_n
+      value = next_byte
+      and_to_a value
       @clock += 2
     end
     
@@ -371,7 +380,7 @@ module JanoGB
       # 0xD0
       :_D0, :_D1, :_D2, :_D3, :_D4, :_D5, :_D6, :_D7, :_D8, :_D9, :_DA, :_DB, :_DC, :_DD, :_DE, :_DF,
       # 0xE0
-      :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :_E6, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :_EE, :_EF,
+      :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :and_n, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :_EE, :_EF,
       # 0xF0
       :_F0, :_F1, :_F2, :_F3, :_F4, :_F5, :_F6, :_F7, :_F8, :_F9, :_FA, :_FB, :_FC, :_FD, :_FE, :_FF
     ].freeze

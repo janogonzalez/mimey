@@ -1556,7 +1556,7 @@ describe "CPU operations" do
   end
   
   describe "AND (HL)" do
-    it "should do a logical and between A and a 8 bits register and set the result in A" do
+    it "should do a logical and between A and the memory pointed by the HL register and set the result in A" do
       cpu = CPU.new(a:0b1111_0000, h:0xCA, l:0xFE)
       
       cpu.mmu[0xCAFE] = 0b1010_1010
@@ -1593,6 +1593,44 @@ describe "CPU operations" do
       cpu.h_flag.should be_true
       cpu.c_flag.should be_false
       cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+  
+  describe "AND N" do
+    it "should do a logical and between A and a 8 bit value and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000)
+
+      cpu.load_with(0xE6, 0b1010_1010).step
+      
+      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b1010_0000
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0101_0101)
+      
+      cpu.load_with(0xE6, 0b1010_1010).step
+
+      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
       cpu.clock.should == 2
     end
   end
