@@ -423,10 +423,27 @@ module JanoGB
       @f |= Z_FLAG  if @a == 0x00
     end
     
-    # JR n. Adds N (signed 8 bit number) to current address and jumps to it
+    # JR n. Adds n (signed 8 bit number) to current address and jumps to it
     def jr_n
       @pc += as_signed_byte(next_byte)
       @clock += 3
+    end
+    
+    # JR cc,n.
+    [:z, :c].each do |f|
+      [false, true].each do |b|
+        prefix = b ? '' : 'n'
+        method_name = "jr_#{prefix}#{f}_n"
+        define_method(method_name) do
+          if (send("#{f}_flag") == b)
+            @pc += as_signed_byte(next_byte)
+            @clock += 3
+          else
+            next_byte
+            @clock += 2
+          end
+        end
+      end
     end
     
     # Returns the value as a signed byte
@@ -441,9 +458,9 @@ module JanoGB
       # 0x10
       :_10, :ld_de_nn, :ld_mde_a, :inc_de, :inc_d, :dec_d, :ld_d_n, :_17, :jr_n, :add_hl_de, :ld_a_mde, :dec_de, :inc_e, :dec_e, :ld_e_n, :_1F,
       # 0x20
-      :_20, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :_28, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
+      :jr_nz_n, :ld_hl_nn, :ldi_mhl_a, :inc_hl, :inc_h, :dec_h, :ld_h_n, :_27, :jr_z_n, :add_hl_hl, :ldi_a_mhl, :dec_hl, :inc_l, :dec_l, :ld_l_n, :cpl,
       # 0x30
-      :_30, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :scf, :_38, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
+      :jr_nc_n, :ld_sp_nn, :ldd_mhl_a, :inc_sp, :_34, :_35, :ld_mhl_n, :scf, :jr_c_n, :add_hl_sp, :ldd_a_mhl, :dec_sp, :inc_a, :dec_a, :ld_a_n, :ccf,
       # 0x40
       :ld_b_b, :ld_b_c, :ld_b_d, :ld_b_e, :ld_b_h, :ld_b_l, :ld_b_mhl, :ld_b_a, :ld_c_b, :ld_c_c, :ld_c_d, :ld_c_e, :ld_c_h, :ld_c_l, :ld_c_mhl, :ld_c_a,
       # 0x50
