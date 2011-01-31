@@ -279,13 +279,24 @@ module JanoGB
       end
     end
     
-    # ADC A,(HL). Add memory pointed by HL register and the C (carry) flag to 8 bits A register
-    # Set Z flag if result is 0
-    # Reset N flag
-    # Set H flag if carry from bit 3
-    # Set C flag if carry from bit 7
+    # ADC A,(HL). Adds memory pointed by HL register and the C (carry) flag to 8 bits A register
+    # Sets Z flag if result is 0
+    # Resets N flag
+    # Sets H flag if carry from bit 3
+    # Sets C flag if carry from bit 7
     def adc_a_mhl
       value = @mmu[hl] + ((@f & C_FLAG) >> 4)
+      add_to_a value
+      @clock += 2
+    end
+    
+    # ADC A,n. Adds a 8 bit value and the C (carry) flag to 8 bits A register
+    # Sets Z flag if result is 0
+    # Resets N flag
+    # Sets H flag if carry from bit 3
+    # Sets C flag if carry from bit 7
+    def adc_a_n
+      value = next_byte + ((@f & C_FLAG) >> 4)
       add_to_a value
       @clock += 2
     end
@@ -327,7 +338,7 @@ module JanoGB
       # 0xB0
       :_B0, :_B1, :_B2, :_B3, :_B4, :_B5, :_B6, :_B7, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
       # 0xC0
-      :_C0, :_C1, :_C2, :_C3, :_C4, :_C5, :add_a_n, :_C7, :_C8, :_C9, :_CA, :_CB, :_CC, :_CD, :_CE, :_CF,
+      :_C0, :_C1, :_C2, :_C3, :_C4, :_C5, :add_a_n, :_C7, :_C8, :_C9, :_CA, :_CB, :_CC, :_CD, :adc_a_n, :_CF,
       # 0xD0
       :_D0, :_D1, :_D2, :_D3, :_D4, :_D5, :_D6, :_D7, :_D8, :_D9, :_DA, :_DB, :_DC, :_DD, :_DE, :_DF,
       # 0xE0
