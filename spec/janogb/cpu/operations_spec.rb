@@ -1634,4 +1634,136 @@ describe "CPU operations" do
       cpu.clock.should == 2
     end
   end
+
+  describe "XOR R operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      opcodes = [0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAF]
+      
+      [:xor_b, :xor_c, :xor_d, :xor_e, :xor_h, :xor_l, :xor_a].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+    
+    it "should do a XOR between A and a 8 bits register and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000, b:0b1010_1010)
+      
+      cpu.load_with(0xA8).step
+      
+      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b0101_1010
+      cpu.b.should == 0b1010_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0101_0101, b:0b0101_0101)
+
+      cpu.load_with(0xA8).step
+
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.b.should == 0b0101_0101
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end  
+  end
+  
+  describe "XOR (HL)" do
+    it "should do a XOR between A and the memory pointed by the HL register and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000, h:0xCA, l:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0b1010_1010
+      cpu.load_with(0xAE).step
+      
+      [:f, :b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b0101_1010
+      cpu.mmu[0xCAFE].should == 0b1010_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0101_0101, h:0xCA, l:0xFE)
+      
+      cpu.mmu[0xCAFE] = 0b0101_0101
+      cpu.load_with(0xAE).step
+
+      [:b, :c, :d, :e, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.mmu[0xCAFE].should == 0b0101_0101
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 2
+    end
+  end
+  
+  describe "XOR N" do
+    it "should do a logical XOR between A and a 8 bit value and set the result in A" do
+      cpu = CPU.new(a:0b1111_0000)
+
+      cpu.load_with(0xEE, 0b1010_1010).step
+      
+      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0b0101_1010
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
+    end
+    
+    it "should set the Z flag it the result is 0x00" do
+      cpu = CPU.new(a:0b0101_0101)
+      
+      cpu.load_with(0xEE, 0b0101_0101).step
+
+      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+
+      cpu.a.should == 0b0000_0000
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_false
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0002
+      cpu.clock.should == 2
+    end
+  end
 end

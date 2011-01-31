@@ -311,7 +311,7 @@ module JanoGB
       @a = sum & 0xFF
     end
     
-    # AND R operations. Do a logical and between A and a 8 bits register and set the result in A
+    # AND R operations. Do a logical AND between A and a 8 bits register and set the result in A
     # Set Z flag if result is 0
     # Reset N and C flags, Set H flag
     [:b, :c, :d, :e, :h, :l, :a].each do |r|
@@ -323,7 +323,7 @@ module JanoGB
       end
     end
     
-    # AND (HL). Does a logical and between A and the memory pointed by the HL register and set the result in A
+    # AND (HL). Does a logical AND between A and the memory pointed by the HL register and set the result in A
     # Set Z flag if result is 0
     # Reset N and C flags, Set H flag
     def and_mhl
@@ -332,7 +332,7 @@ module JanoGB
       @clock += 2
     end
     
-    # AND N. Does a logical and between A and a 8 bit value and set the result in A
+    # AND N. Does a logical AND between A and a 8 bit value and set the result in A
     # Set Z flag if result is 0
     # Reset N and C flags, Set H flag
     def and_n
@@ -341,11 +341,48 @@ module JanoGB
       @clock += 2
     end
     
-    # Does a logical and to the A register
+    # Does a logical AND to the A register
     def and_to_a(to_and)
       @a &= to_and
       @f = 0x00
       @f |= H_FLAG
+      @f |= Z_FLAG  if @a == 0x00
+    end
+
+    # XOR R operations. Do a logical XOR between A and a 8 bits register and set the result in A
+    # Set Z flag if result is 0
+    # Reset N, H and C flags
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "xor_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        xor_to_a value
+        @clock += 1
+      end
+    end
+    
+    # XOR (HL). Does a logical XOR between A and the memory pointed by the HL register and set the result in A
+    # Sets Z flag if result is 0
+    # Resets N, H and C flags
+    def xor_mhl
+      value = @mmu[hl]
+      xor_to_a value
+      @clock += 2
+    end
+    
+    # XOR N. Does a logical XOR between A and a 8 bit value and set the result in A
+    # Sets Z flag if result is 0
+    # Resets N, H and C flags
+    def xor_n
+      value = next_byte
+      xor_to_a value
+      @clock += 2
+    end
+    
+    # Does a logical XOR to the A register
+    def xor_to_a(to_xor)
+      @a ^= to_xor
+      @f = 0x00
       @f |= Z_FLAG  if @a == 0x00
     end
 
@@ -372,7 +409,7 @@ module JanoGB
       # 0x90
       :_90, :_91, :_92, :_93, :_94, :_95, :_96, :_97, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
       # 0xA0
-      :and_b, :and_c, :and_d, :and_e, :and_h, :and_l, :and_mhl, :and_a, :_A8, :_A9, :_AA, :_AB, :_AC, :_AD, :_AE, :_AF,
+      :and_b, :and_c, :and_d, :and_e, :and_h, :and_l, :and_mhl, :and_a, :xor_b, :xor_c, :xor_d, :xor_e, :xor_h, :xor_l, :xor_mhl, :xor_a,
       # 0xB0
       :_B0, :_B1, :_B2, :_B3, :_B4, :_B5, :_B6, :_B7, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
       # 0xC0
@@ -380,7 +417,7 @@ module JanoGB
       # 0xD0
       :_D0, :_D1, :_D2, :_D3, :_D4, :_D5, :_D6, :_D7, :_D8, :_D9, :_DA, :_DB, :_DC, :_DD, :_DE, :_DF,
       # 0xE0
-      :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :and_n, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :_EE, :_EF,
+      :_E0, :_E1, :_E2, :_E3, :_E4, :_E5, :and_n, :_E7, :_E8, :_E9, :_EA, :_EB, :_EC, :_ED, :xor_n, :_EF,
       # 0xF0
       :_F0, :_F1, :_F2, :_F3, :_F4, :_F5, :_F6, :_F7, :_F8, :_F9, :_FA, :_FB, :_FC, :_FD, :_FE, :_FF
     ].freeze
