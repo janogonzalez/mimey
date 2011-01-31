@@ -311,6 +311,9 @@ module JanoGB
       @a = sum & 0xFF
     end
     
+    # AND R operations. D a logical and between A and a 8 bits register and set the result in A
+    # Set Z flag if result is 0
+    # Reset N and C flags, Set H flag
     [:b, :c, :d, :e, :h, :l, :a].each do |r|
       method_name = "and_#{r}"
       define_method(method_name) do
