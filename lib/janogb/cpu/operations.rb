@@ -310,6 +310,18 @@ module JanoGB
       @f |= C_FLAG  if sum > 0xFF
       @a = sum & 0xFF
     end
+    
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "and_#{r}"
+      define_method(method_name) do
+        to_and = instance_variable_get "@#{r}"
+        @a &= to_and
+        @f = 0x00
+        @f |= H_FLAG
+        @f |= Z_FLAG  if @a == 0x00
+        @clock += 1
+      end
+    end
 
     # Operations array, indexes methods names by opcode
     OPERATIONS = [
@@ -334,7 +346,7 @@ module JanoGB
       # 0x90
       :_90, :_91, :_92, :_93, :_94, :_95, :_96, :_97, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
       # 0xA0
-      :_A0, :_A1, :_A2, :_A3, :_A4, :_A5, :_A6, :_A7, :_A8, :_A9, :_AA, :_AB, :_AC, :_AD, :_AE, :_AF,
+      :and_b, :and_c, :and_d, :and_e, :and_h, :and_l, :_A6, :and_a, :_A8, :_A9, :_AA, :_AB, :_AC, :_AD, :_AE, :_AF,
       # 0xB0
       :_B0, :_B1, :_B2, :_B3, :_B4, :_B5, :_B6, :_B7, :_B8, :_B9, :_BA, :_BB, :_BC, :_BD, :_BE, :_BF,
       # 0xC0
