@@ -1494,4 +1494,113 @@ describe "CPU arithmetic/logical operations" do
       cpu.clock.should == 2
     end
   end
+
+  describe "SUB A,R operations" do
+    it "must be 7" do
+      cpu = CPU.new
+      
+      opcodes = [0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x97]
+      
+      [:sub_a_b, :sub_a_c, :sub_a_d, :sub_a_e, :sub_a_h, :sub_a_l, :sub_a_a].each_with_index do |m, i|
+        cpu.should respond_to m
+        opcode = opcodes[i]
+        CPU::OPERATIONS[opcode].should == m
+      end
+    end
+    
+    it "must substract a register to the A register" do
+      cpu = CPU.new(a:0xAC, b:0xAC)
+      
+      cpu.load_with(0x90).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x00
+      cpu.b.should == 0xAC
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set H flag if current value is of the form 0xn0 and the value to sub of the form 0xnF" do
+      cpu = CPU.new(a:0x10, b:0x1F)
+      
+      cpu.load_with(0x90).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0xF1
+      cpu.b.should == 0x1F
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should not set H flag if current value is of the form 0xnF and the value to sub is of the form 0xn0" do
+      cpu = CPU.new(a:0x1F, b:0x10)
+      
+      cpu.load_with(0x90).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x0F
+      cpu.b.should == 0x10
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "should set H and C flags if sub overflows" do
+      cpu = CPU.new(a:0x02, b:0xFF)
+
+      cpu.load_with(0x90).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x03
+      cpu.b.should == 0xFF
+      cpu.z_flag.should be_false
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_true
+      cpu.c_flag.should be_true
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+    
+    it "must set the Z flag if the result is 0" do
+      cpu = CPU.new(a:0xCA, b:0xCA)
+
+      cpu.load_with(0x90).step
+      
+      [:c, :d, :e, :h, :l, :sp].each do |r|
+        cpu.instance_variable_get("@#{r}").should == 0x00
+      end
+      
+      cpu.a.should == 0x00
+      cpu.b.should == 0xCA
+      cpu.z_flag.should be_true
+      cpu.n_flag.should be_true
+      cpu.h_flag.should be_false
+      cpu.c_flag.should be_false
+      cpu.pc.should == 0x0001
+      cpu.clock.should == 1
+    end
+  end
 end

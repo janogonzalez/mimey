@@ -31,7 +31,7 @@ module JanoGB
       # 0x80
       :add_a_b, :add_a_c, :add_a_d, :add_a_e, :add_a_h, :add_a_l, :add_a_mhl, :add_a_a, :adc_a_b, :adc_a_c, :adc_a_d, :adc_a_e, :adc_a_h, :adc_a_l, :adc_a_mhl, :adc_a_a,
       # 0x90
-      :_90, :_91, :_92, :_93, :_94, :_95, :_96, :_97, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
+      :sub_a_b, :sub_a_c, :sub_a_d, :sub_a_e, :sub_a_h, :sub_a_l, :_96, :sub_a_a, :_98, :_99, :_9A, :_9B, :_9C, :_9D, :_9E, :_9F,
       # 0xA0
       :and_b, :and_c, :and_d, :and_e, :and_h, :and_l, :and_mhl, :and_a, :xor_b, :xor_c, :xor_d, :xor_e, :xor_h, :xor_l, :xor_mhl, :xor_a,
       # 0xB0

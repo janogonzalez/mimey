@@ -288,5 +288,30 @@ module JanoGB
       @f = 0x00
       @f |= Z_FLAG  if @a == 0x00
     end
+    
+    # SUB A,R operations. Substracts R 8 bits register to 8 bits A register
+    # Set Z flag if result is 0
+    # Reset N flag
+    # Set H flag if carry from bit 3
+    # Set C flag if carry from bit 7
+    [:b, :c, :d, :e, :h, :l, :a].each do |r|
+      method_name = "sub_a_#{r}"
+      define_method(method_name) do
+        value = instance_variable_get "@#{r}"
+        sub_to_a value
+        @clock += 1
+      end
+    end
+    
+    # Substracts a value to the A register
+    def sub_to_a(to_sub)
+      sub = @a - to_sub
+      @f = 0x00
+      @f |= Z_FLAG  if sub & 0xFF == 0x00
+      @f |= N_FLAG
+      @f |= H_FLAG  if ((@a & 0x0F) - (to_sub & 0x0F)) & 0xFFF0 != 0x00
+      @f |= C_FLAG  if sub & 0xFF00 != 0x00
+      @a = sub & 0xFF
+    end
   end
 end

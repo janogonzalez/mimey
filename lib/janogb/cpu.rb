@@ -35,7 +35,8 @@ module JanoGB
     C_FLAG = 0b0001_0000
     
     # Creates a new CPU and initializes with the provided options
-    # if no options where give all the registers will be 0
+    # if no options where give all the registers will be initialized
+    # with deafult values
     def initialize(options = {})   
       DEFAULTS.merge(options).each do |k, v|
         instance_variable_set("@#{k}", v)
