@@ -29,6 +29,7 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.bc.should == 0x0001
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -37,11 +38,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x03).step
       
-      [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
   end
@@ -64,30 +62,18 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x04).step
       
-      [:a, :c, :f, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.b.should == 0x01
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0x01, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
     it "should set H flag if current value is 0x0F" do
-      cpu = CPU.new(b: 0x0F)
+      cpu = CPU.new(b:0x0F)
       
       cpu.load_with(0x04).step
       
-      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.b.should == 0x10
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0x10, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 1
     end
     
@@ -96,15 +82,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x04).step
       
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:z, :h)
       cpu.clock.should == 1
     end
     
@@ -113,10 +92,9 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x04).step
       
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
+      cpu.should have_only_registers(b:0x01, pc:0x0001)
+      cpu.should have_only_flags(:c)
+      cpu.clock.should == 1
     end
   end
   
@@ -138,15 +116,9 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x05).step
       
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:z, :n)
+
       cpu.clock.should == 1
     end
     
@@ -155,16 +127,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x05).step
       
-      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.b.should == 0x0F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0x0F, pc:0x0001)
+      cpu.should have_only_flags(:n, :h)
       cpu.clock.should == 1
     end
     
@@ -173,16 +137,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x05).step
       
-      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.b.should == 0xFE
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:n)
       cpu.clock.should == 1
     end
     
@@ -191,16 +147,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x05).step
       
-      [:a, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.b.should == 0xFF
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0xFF, pc:0x0001)
+      cpu.should have_only_flags(:n, :h)
       cpu.clock.should == 1
     end
     
@@ -209,15 +157,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x05).step
       
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:z, :n, :c)
       cpu.clock.should == 1
     end
   end
@@ -245,11 +186,8 @@ describe "CPU arithmetic/logical operations" do
       end
       
       cpu.hl.should == 0xACDC
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -263,11 +201,8 @@ describe "CPU arithmetic/logical operations" do
       end
       
       cpu.hl.should == 0x1000
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 2
     end
     
@@ -281,11 +216,8 @@ describe "CPU arithmetic/logical operations" do
       end
       
       cpu.hl.should == 0x1FFF
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -299,11 +231,8 @@ describe "CPU arithmetic/logical operations" do
       end
       
       cpu.hl.should == 0x0000
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags(:h, :c)
       cpu.clock.should == 2
     end
     
@@ -317,11 +246,8 @@ describe "CPU arithmetic/logical operations" do
       end
       
       cpu.hl.should == 0xABCD
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags(:z)
       cpu.clock.should == 2
     end
   end
@@ -344,11 +270,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x0B).step
       
-      [:a, :b, :c, :f, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -363,6 +286,7 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.bc.should == 0xFFFF
       cpu.pc.should == 0x0001
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
   end
@@ -372,17 +296,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b1010_1010)
 
       cpu.load_with(0x2F).step
-
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0101_0101
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(a:0b0101_0101, pc:0x0001)
+      cpu.should have_only_flags(:n, :h)
       cpu.clock.should == 1
     end
     
@@ -390,17 +306,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b1010_1010, f:0b1001_0000)
 
       cpu.load_with(0x2F).step
-
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0101_0101
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(a:0b0101_0101, pc:0x0001)
+      cpu.should have_only_flags(:z, :n, :h, :c)
       cpu.clock.should == 1
     end
   end
@@ -410,16 +318,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(f:0b0000_0000)
 
       cpu.load_with(0x3F).step
-
-      [:a, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
       
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:c)
       cpu.clock.should == 1
     end
     
@@ -427,16 +328,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(f:0b0001_0000)
 
       cpu.load_with(0x3F).step
-
-      [:a, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -444,16 +338,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(f:0b1110_0000)
 
       cpu.load_with(0x3F).step
-
-      [:a, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:z, :c)
       cpu.clock.should == 1
     end
   end
@@ -463,16 +350,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(f:0b0000_0000)
 
       cpu.load_with(0x37).step
-
-      [:a, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:c)
       cpu.clock.should == 1
     end
 
@@ -480,16 +360,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(f:0b1111_0000)
 
       cpu.load_with(0x37).step
-
-      [:a, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(pc:0x0001)
+      cpu.should have_only_flags(:z, :c)
       cpu.clock.should == 1
     end
   end
@@ -512,17 +385,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x80).step
       
-      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
-      cpu.b.should == 0xAC
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0xAC, b:0xAC, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -531,17 +395,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x80).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
-      cpu.b.should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x20, b:0x01, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 1
     end
     
@@ -550,17 +405,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x80).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
-      cpu.b.should == 0x10
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x2F, b:0x10, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -569,17 +415,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x80).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
-      cpu.b.should == 0x02
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x01, b:0x02, pc:0x0001)
+      cpu.should have_only_flags(:h, :c)
       cpu.clock.should == 1
     end
     
@@ -588,17 +425,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x80).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.b.should == 0x01
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x00, b:0x01, pc:0x0001)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.clock.should == 1
     end
   end
@@ -610,17 +438,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0xAC
       cpu.load_with(0x86).step
       
-      [:f, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
+      cpu.should have_only_registers(a:0xAC, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0xAC
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -630,17 +450,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x01
       cpu.load_with(0x86).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
+      cpu.should have_only_registers(a:0x20, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.mmu[0xCAFE].should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -650,17 +462,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x10
       cpu.load_with(0x86).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
+      cpu.should have_only_registers(a:0x2F, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0x10
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -670,17 +474,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x02
       cpu.load_with(0x86).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
+      cpu.should have_only_registers(a:0x01, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:h, :c)
       cpu.mmu[0xCAFE].should == 0x02
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -690,17 +486,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x01
       cpu.load_with(0x86).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
+      cpu.should have_only_registers(a:0x00, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.mmu[0xCAFE].should == 0x01
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
   end
@@ -711,16 +499,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xC6, 0xAC).step
       
-      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0xAC, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -729,16 +509,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xC6, 0x01).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x20, pc:0x0002)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 2
     end
     
@@ -747,16 +519,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0xC6, 0x10).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x2F, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -765,16 +529,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xC6, 0x02).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x01, pc:0x0002)
+      cpu.should have_only_flags(:h, :c)
       cpu.clock.should == 2
     end
     
@@ -783,16 +539,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xC6, 0x01).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x00, pc:0x0002)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.clock.should == 2
     end
   end
@@ -815,17 +563,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x88).step
       
-      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
-      cpu.b.should == 0xAB
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0xAC, b:0xAB, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -834,17 +573,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x88).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
-      cpu.b.should == 0x00
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x20, b:0x00, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 1
     end
     
@@ -853,17 +583,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x88).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
-      cpu.b.should == 0x0F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x2F, b:0x0F, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -872,17 +593,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x88).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
-      cpu.b.should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x01, b:0x01, pc:0x0001)
+      cpu.should have_only_flags(:h, :c)
       cpu.clock.should == 1
     end
     
@@ -891,17 +603,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x88).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.b.should == 0x00
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x00, b:0x00, pc:0x0001)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.clock.should == 1
     end
   end
@@ -913,17 +616,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0xAB
       cpu.load_with(0x8E).step
       
-      [:f, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
+      cpu.should have_only_registers(a:0xAC, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0xAB
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -933,17 +628,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x00
       cpu.load_with(0x8E).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
+      cpu.should have_only_registers(a:0x20, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.mmu[0xCAFE].should == 0x00
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -953,17 +640,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x0F
       cpu.load_with(0x8E).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
+      cpu.should have_only_registers(a:0x2F, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0x0F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -973,17 +652,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x01
       cpu.load_with(0x8E).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
+      cpu.should have_only_registers(a:0x01, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:h, :c)
       cpu.mmu[0xCAFE].should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -993,17 +664,8 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0x00
       cpu.load_with(0x8E).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.mmu[0xCAFE].should == 0x00
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x00, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.clock.should == 2
     end
   end
@@ -1014,16 +676,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xCE, 0xAB).step
       
-      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xAC
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0xAC, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -1032,16 +686,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xCE, 0x00).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x20
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x20, pc:0x0002)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 2
     end
     
@@ -1050,16 +696,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xCE, 0x0F).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x2F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x2F, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -1068,16 +706,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xCE, 0x01).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x01, pc:0x0002)
+      cpu.should have_only_flags(:h, :c)
       cpu.clock.should == 2
     end
     
@@ -1086,16 +716,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xCE, 0x00).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0x00, pc:0x0002)
+      cpu.should have_only_flags(:z, :h, :c)
       cpu.clock.should == 2
     end
   end
@@ -1118,17 +740,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xA0).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1010_0000
-      cpu.b.should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0b1010_0000, b:0b1010_1010, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 1
     end
     
@@ -1136,18 +749,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0101_0101, b:0b1010_1010)
 
       cpu.load_with(0xA0).step
-
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.b.should == 0b1010_1010
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(a:0b0000_0000, b:0b1010_1010, pc:0x0001)
+      cpu.should have_only_flags(:z, :h)
       cpu.clock.should == 1
     end  
   end
@@ -1159,17 +763,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0b1010_1010
       cpu.load_with(0xA6).step
       
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1010_0000
+      cpu.should have_only_registers(a:0b1010_0000, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:h)
       cpu.mmu[0xCAFE].should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -1178,18 +774,10 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.mmu[0xCAFE] = 0b1010_1010
       cpu.load_with(0xA6).step
-
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
+      
+      cpu.should have_only_registers(a:0b0000_0000, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:z, :h)
       cpu.mmu[0xCAFE].should == 0b1010_1010
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
   end
@@ -1200,16 +788,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0xE6, 0b1010_1010).step
       
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1010_0000
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0b1010_0000, pc:0x0002)
+      cpu.should have_only_flags(:h)
       cpu.clock.should == 2
     end
     
@@ -1217,17 +797,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0101_0101)
       
       cpu.load_with(0xE6, 0b1010_1010).step
-
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      
+      cpu.should have_only_registers(a:0b0000_0000, pc:0x0002)
+      cpu.should have_only_flags(:z, :h)
       cpu.clock.should == 2
     end
   end
@@ -1250,17 +822,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xA8).step
       
-      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b0101_1010
-      cpu.b.should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0b0101_1010, b:0b1010_1010, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -1268,18 +831,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0101_0101, b:0b0101_0101)
 
       cpu.load_with(0xA8).step
-
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.b.should == 0b0101_0101
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(a:0b0000_0000, b:0b0101_0101, pc:0x0001)
+      cpu.should have_only_flags(:z)
       cpu.clock.should == 1
     end  
   end
@@ -1291,17 +845,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0b1010_1010
       cpu.load_with(0xAE).step
       
-      [:f, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b0101_1010
+      cpu.should have_only_registers(a:0b0101_1010, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -1310,18 +856,10 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.mmu[0xCAFE] = 0b0101_0101
       cpu.load_with(0xAE).step
-
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
+      
+      cpu.should have_only_registers(a:0b0000_0000, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:z)
       cpu.mmu[0xCAFE].should == 0b0101_0101
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
   end
@@ -1332,16 +870,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0xEE, 0b1010_1010).step
       
-      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b0101_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0b0101_1010, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -1349,17 +879,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0101_0101)
       
       cpu.load_with(0xEE, 0b0101_0101).step
-
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      
+      cpu.should have_only_registers(a:0b0000_0000, pc:0x0002)
+      cpu.should have_only_flags(:z)
       cpu.clock.should == 2
     end
   end
@@ -1382,17 +904,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0xB0).step
       
-      [:f, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1111_1010
-      cpu.b.should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0b1111_1010, b:0b1010_1010, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.clock.should == 1
     end
     
@@ -1400,18 +913,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0000_0000, b:0b0000_0000)
 
       cpu.load_with(0xB0).step
-
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.b.should == 0b0000_0000
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      
+      cpu.should have_only_registers(a:0b0000_0000, b:0b0000_0000, pc:0x0001)
+      cpu.should have_only_flags(:z)
       cpu.clock.should == 1
     end  
   end
@@ -1423,17 +927,9 @@ describe "CPU arithmetic/logical operations" do
       cpu.mmu[0xCAFE] = 0b1010_1010
       cpu.load_with(0xB6).step
       
-      [:f, :b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1111_1010
+      cpu.should have_only_registers(a:0b1111_1010, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags()
       cpu.mmu[0xCAFE].should == 0b1010_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
     
@@ -1442,18 +938,10 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.mmu[0xCAFE] = 0b0000_0000
       cpu.load_with(0xB6).step
-
-      [:b, :c, :d, :e, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
+      
+      cpu.should have_only_registers(a:0b0000_0000, h:0xCA, l:0xFE, pc:0x0001)
+      cpu.should have_only_flags(:z)
       cpu.mmu[0xCAFE].should == 0b0000_0000
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
       cpu.clock.should == 2
     end
   end
@@ -1464,16 +952,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0xF6, 0b1010_1010).step
       
-      [:f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0b1111_1010
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      cpu.should have_only_registers(a:0b1111_1010, pc:0x0002)
+      cpu.should have_only_flags()
       cpu.clock.should == 2
     end
     
@@ -1481,17 +961,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0b0000_0000)
       
       cpu.load_with(0xF6, 0b0000_0000).step
-
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0b0000_0000
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0002
+      
+      cpu.should have_only_registers(a:0b0000_0000, pc:0x0002)
+      cpu.should have_only_flags(:z)
       cpu.clock.should == 2
     end
   end
@@ -1514,17 +986,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x90).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.b.should == 0xAC
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(b:0xAC, pc:0x0001)
+      cpu.should have_only_flags(:z, :n)
       cpu.clock.should == 1
     end
     
@@ -1533,17 +996,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x90).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0xF1
-      cpu.b.should == 0x1F
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0xF1, b:0x1F, pc:0x0001)
+      cpu.should have_only_flags(:n, :h, :c)
       cpu.clock.should == 1
     end
     
@@ -1552,17 +1006,8 @@ describe "CPU arithmetic/logical operations" do
       
       cpu.load_with(0x90).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x0F
-      cpu.b.should == 0x10
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x0F, b:0x10, pc:0x0001)
+      cpu.should have_only_flags(:n)
       cpu.clock.should == 1
     end
     
@@ -1571,17 +1016,8 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x90).step
       
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x03
-      cpu.b.should == 0xFF
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_true
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
+      cpu.should have_only_registers(a:0x03, b:0xFF, pc:0x0001)
+      cpu.should have_only_flags(:n, :h, :c)
       cpu.clock.should == 1
     end
     
@@ -1590,7 +1026,7 @@ describe "CPU arithmetic/logical operations" do
 
       cpu.load_with(0x90).step
 
-      cpu.should have_only_registers(b: 0xCA, pc: 0x0001)
+      cpu.should have_only_registers(b:0xCA, pc:0x0001)
       cpu.should have_only_flags(:z, :n)
       cpu.clock.should == 1
     end

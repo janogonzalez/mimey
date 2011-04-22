@@ -1,18 +1,25 @@
 require 'rspec'
 
-RSpec::Matchers.define :have_only_registers do |registers|
-  DEFAULT_REGISTERS = {
-    a: 0x00,
-    b: 0x00,
-    c: 0x00,
-    d: 0x00,
-    e: 0x00,
-    h: 0x00,
-    l: 0x00,
-    pc: 0x0000,
-    sp: 0x0000
-  }
-  
+DEFAULT_REGISTERS = {
+  a: 0x00,
+  b: 0x00,
+  c: 0x00,
+  d: 0x00,
+  e: 0x00,
+  h: 0x00,
+  l: 0x00,
+  pc: 0x0000,
+  sp: 0x0000
+}
+
+DEFAULT_FLAGS = {
+  z: false,
+  n: false,
+  h: false,
+  c: false
+}
+
+RSpec::Matchers.define :have_only_registers do |registers|  
   match do |cpu|
     @matched = {}
     @not_matched = {}
@@ -40,13 +47,6 @@ RSpec::Matchers.define :have_only_registers do |registers|
 end
 
 RSpec::Matchers.define :have_only_flags do |*flags|
-  DEFAULT_FLAGS = {
-    z: false,
-    n: false,
-    h: false,
-    c: false
-  }
-  
   match do |cpu|
     @matched = {}
     @not_matched = {}
