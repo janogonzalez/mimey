@@ -1,5 +1,6 @@
 require 'rspec'
 require 'janogb'
+require 'spec_helper'
 
 describe "CPU arithmetic/logical operations" do
   include JanoGB
@@ -1588,18 +1589,9 @@ describe "CPU arithmetic/logical operations" do
       cpu = CPU.new(a:0xCA, b:0xCA)
 
       cpu.load_with(0x90).step
-      
-      [:c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-      
-      cpu.a.should == 0x00
-      cpu.b.should == 0xCA
-      cpu.z_flag.should be_true
-      cpu.n_flag.should be_true
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
+
+      cpu.should have_only_registers(b: 0xCA, pc: 0x0001)
+      cpu.should have_only_flags(:z, :n)
       cpu.clock.should == 1
     end
   end
