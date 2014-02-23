@@ -1,4 +1,7 @@
 require 'rspec'
+require 'janogb'
+
+include JanoGB
 
 DEFAULT_REGISTERS = {
   a: 0x00,

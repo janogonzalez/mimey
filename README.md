@@ -10,19 +10,20 @@ At the moment JanoGB is in a very early stage, it emulates only a half of the CP
 Development
 -----------
 
-1. If you use RVM, create a gemset with a `.rvmrc` file and use it
+1. Install bundler:
 
-        rvm use 1.9.2
-        rvm --create --rvmrc 1.9.2@janogb
-        rvm gemset use janogb
+```
+gem install bundler
+```
 
-2. Install bundler and install the gems
+2. Run bundler:
 
-        gem install bundler
-        bundle
+```
+bundle install
+```
 
-3. Run the automated test suite
+3. Run the tests:
 
-        watchr specs.watchr.rb
-    
-4. Develop!
+```
+bundle exec rspec
+```
