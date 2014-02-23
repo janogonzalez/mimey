@@ -12,18 +12,18 @@ Development
 
 1. Install bundler:
 
-```
-gem install bundler
-```
+    ```
+    gem install bundler
+    ```
 
 2. Run bundler:
 
-```
-bundle install
-```
+    ```
+    bundle install
+    ```
 
 3. Run the tests:
 
-```
-bundle exec rspec
-```
+    ```
+    bundle exec rspec
+    ```
