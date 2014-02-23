@@ -5,7 +5,7 @@ module JanoGB
       @pc += as_signed_byte(next_byte)
       @clock += 3
     end
-    
+
     # JR cc,n.
     [:z, :c].each do |f|
       [false, true].each do |b|
@@ -22,7 +22,7 @@ module JanoGB
         end
       end
     end
-    
+
     # Returns the value as a signed byte
     def as_signed_byte(value)
       [ value ].pack("c").unpack("c").first

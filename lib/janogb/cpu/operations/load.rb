@@ -8,7 +8,7 @@ module JanoGB
         @clock += 3
       end
     end
-    
+
     # LD (RR), A operations. Loads the A register into the
     # 16 bit memory direction pointed by RR regiser
     [:bc, :de, :hl].each do |r|
@@ -19,7 +19,7 @@ module JanoGB
         @clock += 2
       end
     end
-    
+
     # LD R,n operations. Loads a 8 bits value to a 8 bits register
     [:b, :c, :d, :e, :h, :l, :a].each do |r|
       method_name = "ld_#{r}_n"
@@ -28,13 +28,13 @@ module JanoGB
         @clock += 2
       end
     end
-    
+
     # LD (NN),SP. Loads the 16 bits SP register into 16 bits memory direction NN
     def ld_mnn_sp
       @mmu.word[next_word] = sp
       @clock += 5
     end
-    
+
     # LD A,(RR) operations. Loads the memory pointed by RR register
     # into the A register
     [:bc, :de, :hl].each do |r|
@@ -45,7 +45,7 @@ module JanoGB
         @clock += 2
       end
     end
-    
+
     # LD R,R operations. Load a 8 bit register into another
     [:b, :c, :d, :e, :h, :l, :a].each do |r1|
       [:b, :c, :d, :e, :h, :l, :a].each do |r2|
@@ -56,8 +56,8 @@ module JanoGB
           @clock += 1
         end
       end
-    end  
-    
+    end
+
     # LD R,(HL) operations. Load the memory pointed by register HL into a 8 bits register
     [:b, :c, :d, :e, :h, :l].each do |r|
       method_name = "ld_#{r}_mhl"
@@ -66,8 +66,8 @@ module JanoGB
         @clock += 2
       end
     end
-    
-    # LD (HL),R operations. Load a 8 bits register into the memory pointed by register HL 
+
+    # LD (HL),R operations. Load a 8 bits register into the memory pointed by register HL
     [:b, :c, :d, :e, :h, :l].each do |r|
       method_name = "ld_mhl_#{r}"
       define_method(method_name) do
@@ -76,35 +76,35 @@ module JanoGB
         @clock += 2
       end
     end
-    
+
     # LDI (HL),A. Loads the A register into the memory pointed by HL, and then increments HL
     def ldi_mhl_a
       @mmu[hl] = @a
       self.hl = (hl + 1) & 0xFFFF
       @clock += 2
     end
-    
+
     # LDI A,(HL). Loads the memory pointed by HL into the A register, and then increments HL
     def ldi_a_mhl
       @a = @mmu[hl]
       self.hl = (hl + 1) & 0xFFFF
       @clock += 2
     end
-    
+
     # LDD (HL),A. Loads the A register into the memory pointed by HL, and then decrements HL
     def ldd_mhl_a
       @mmu[hl] = @a
       self.hl = (hl - 1) & 0xFFFF
       @clock += 2
     end
-    
+
     # LDD A,(HL). Loads the memory pointed by HL into the A register, and then decrements HL
     def ldd_a_mhl
       @a = @mmu[hl]
       self.hl = (hl - 1) & 0xFFFF
       @clock += 2
     end
-    
+
     # LD (HL),n. Loads a 8 bit number into the memory pointed by HL
     def ld_mhl_n
       @mmu[hl] = next_byte
