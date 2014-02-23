@@ -1,19 +1,16 @@
-require 'rspec'
-require 'janogb'
+require 'spec_helper'
 
-describe "CPU operations" do
-  include JanoGB
+describe JanoGB::CPU do
+  subject(:cpu) { JanoGB::CPU.new }
 
-  it "should have a NOP operation with opcode 0x00 that does nothing" do
-    cpu = CPU.new
-
-    cpu.load_with(0x00).step
+  describe 'NOP operation' do
+    before { cpu.load_with(0x00).step }
 
     [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-      cpu.instance_variable_get("@#{r}").should == 0x00
+      its(r) { should == 0 }
     end
 
-    cpu.pc.should == 0x0001
-    cpu.clock.should == 1
+    its(:pc) { should == 0x0001 }
+    its(:clock) { should == 1 }
   end
 end
