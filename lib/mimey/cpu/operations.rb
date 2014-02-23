@@ -1,9 +1,9 @@
-require 'janogb/cpu/operations/alu'
-require 'janogb/cpu/operations/bit'
-require 'janogb/cpu/operations/jump'
-require 'janogb/cpu/operations/load'
+require 'mimey/cpu/operations/alu'
+require 'mimey/cpu/operations/bit'
+require 'mimey/cpu/operations/jump'
+require 'mimey/cpu/operations/load'
 
-module JanoGB
+module Mimey
   class CPU
     # NOP, opcode 0x00. Does nothing
     def nop

@@ -1,6 +1,6 @@
-require 'janogb/cpu/operations'
+require 'mimey/cpu/operations'
 
-module JanoGB
+module Mimey
   # This class represents the Game Boy CPU, a modified Z80.
   class CPU
     # 8 bit registers: A, F, B, C, D, E, H, L

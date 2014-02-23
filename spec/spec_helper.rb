@@ -1,7 +1,7 @@
 require 'rspec'
-require 'janogb'
+require 'mimey'
 
-include JanoGB
+include Mimey
 
 DEFAULT_REGISTERS = {
   a: 0x00,

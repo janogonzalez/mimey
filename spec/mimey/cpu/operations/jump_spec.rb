@@ -1,8 +1,8 @@
 require 'rspec'
-require 'janogb'
+require 'mimey'
 
 describe "CPU jump operations" do
-  include JanoGB
+  include Mimey
 
   describe "JR n" do
     it "should add n to current address and jump to it" do

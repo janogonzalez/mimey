@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe JanoGB::CPU do
-  subject(:cpu) { JanoGB::CPU.new(options) }
-  let(:options) { JanoGB::CPU::DEFAULTS }
+describe Mimey::CPU do
+  subject(:cpu) { Mimey::CPU.new(options) }
+  let(:options) { Mimey::CPU::DEFAULTS }
 
   [:a, :f, :b, :c, :d, :e, :h, :l, :pc, :sp].each do |r|
     its(r) { should == 0 }

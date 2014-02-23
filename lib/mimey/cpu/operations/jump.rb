@@ -1,4 +1,4 @@
-module JanoGB
+module Mimey
   class CPU
     # JR n. Adds n (signed 8 bit number) to current address and jumps to it
     def jr_n

@@ -1,4 +1,4 @@
-module JanoGB
+module Mimey
   class CPU
     # LD RR,nn operations. Loads a 16 bits value to a 16 bits register
     [:bc, :de, :hl, :sp].each do |r|

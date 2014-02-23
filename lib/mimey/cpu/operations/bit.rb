@@ -1,4 +1,4 @@
-module JanoGB
+module Mimey
   class CPU
     # RLCA. Rotates to the left the A register, loads the bit 7 into the C flag
     # Resets Z, N and H flags

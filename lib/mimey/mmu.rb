@@ -1,4 +1,4 @@
-module JanoGB
+module Mimey
   # his class represents the Game Boy MMU
   class MMU
     # Initializes the memory areas

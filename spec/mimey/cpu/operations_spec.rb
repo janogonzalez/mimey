@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe JanoGB::CPU do
-  subject(:cpu) { JanoGB::CPU.new }
+describe Mimey::CPU do
+  subject(:cpu) { Mimey::CPU.new }
 
   describe 'NOP operation' do
     before { cpu.load_with(0x00).step }

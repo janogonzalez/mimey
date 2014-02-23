@@ -1,8 +1,8 @@
 require 'rspec'
-require 'janogb'
+require 'mimey'
 
 describe "CPU bit operations" do
-  include JanoGB
+  include Mimey
 
   describe "RLCA" do
     it "should rotate the bits of the A register to the left" do

@@ -1,8 +1,8 @@
 require 'rspec'
-require 'janogb'
+require 'mimey'
 
 describe "CPU load operations" do
-  include JanoGB
+  include Mimey
 
   describe "LD RR,nn operations" do
     it "must be 4" do

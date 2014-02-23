@@ -1,9 +1,9 @@
 require 'rspec'
-require 'janogb'
+require 'mimey'
 require 'spec_helper'
 
 describe "CPU arithmetic/logical operations" do
-  include JanoGB
+  include Mimey
 
   describe "INC RR operations" do
     it "must be 4" do

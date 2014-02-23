@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe JanoGB::MMU do
-  let(:mmu) { JanoGB::MMU.new }
+describe Mimey::MMU do
+  let(:mmu) { Mimey::MMU.new }
 
   it 'writes and reads bytes in the internal memory' do
     mmu[0xC000] = 0xAB

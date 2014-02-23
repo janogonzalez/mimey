@@ -1,4 +1,4 @@
-module JanoGB
+module Mimey
   class CPU
     # INC RR operations. Increment RR register by 1. If current register value is 0xFFFF,
     # it will be 0x0000 after method execution
