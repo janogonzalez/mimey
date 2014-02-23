@@ -1,29 +1,39 @@
-JanoGB
-========
-A Nintendo Game Boy emulator inspired by the work of [Imran Nazar](http://imrannazar.com/GameBoy-Emulation-in-JavaScript).
+# JanoGB
 
-Status
-------
+A [Game Boy][gameboy] emulator written in Ruby.
 
-At the moment JanoGB is in a very early stage, it emulates only a half of the CPU opcodes.
+[gameboy]: http://en.wikipedia.org/wiki/Game_Boy
 
-Development
------------
+## Status
 
-1. Install bundler:
+At the moment JanoGB is in a very early stage and it was abandoned for 3
+years. It emulates only a half of the CPU opcodes.
 
-    ```
-    gem install bundler
-    ```
+## Development
 
-2. Run bundler:
+Install bundler:
 
-    ```
-    bundle install
-    ```
+```
+gem install bundler
+```
 
-3. Run the tests:
+Run bundler:
 
-    ```
-    bundle exec rspec
-    ```
+```
+bundle install
+```
+
+Run the tests:
+
+```
+bundle exec rspec
+```
+
+## Acknowledgements
+
+* [Nintendo](nintendo) for creating the Game Boy.
+* The great tutorial of [Imran Nazar][imran-nazar] finally gave me the
+  motivation to start writing this.
+
+[nintendo]: http://nintendo.com
+[imran-nazar]: http://imrannazar.com/GameBoy-Emulation-in-JavaScript
