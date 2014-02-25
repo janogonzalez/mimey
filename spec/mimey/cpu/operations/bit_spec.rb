@@ -1,82 +1,48 @@
-require 'rspec'
-require 'mimey'
+require 'spec_helper'
 
-describe "CPU bit operations" do
-  include Mimey
+describe Mimey::CPU do
+  subject(:cpu) { Mimey::CPU.new(options) }
+  let(:options) { Mimey::CPU::DEFAULTS }
 
   describe "RLCA" do
-    it "should rotate the bits of the A register to the left" do
-      cpu = CPU.new(a:0x01)
+    before { cpu.load_with(0x07).step }
 
-      cpu.load_with(0x07).step
+    let(:options) {{ a: 0x01 }}
 
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
+    its(:clock) { should == 1 }
+    its(:pc) { should == 0x0001 }
+    specify { cpu.should have_only_flags }
 
+    it "rotates the bits of the A register to the left" do
       cpu.a.should == 0x02
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
-      cpu.clock.should == 1
     end
 
-    it "should load the bit 7 into the C flag" do
-      cpu = CPU.new(a:0xFE)
+    context "when there is carry" do
+      let(:options) {{ a: 0xFE }}
 
-      cpu.load_with(0x07).step
-
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0xFD
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
-      cpu.clock.should == 1
+      its(:a) { should == 0xFD }
+      specify { cpu.should have_only_flags :c }
     end
   end
 
   describe "RRCA" do
-    it "should rotate the bits of the A register to the right" do
-      cpu = CPU.new(a:0x02)
+    before { cpu.load_with(0x0F).step }
 
-      cpu.load_with(0x0F).step
+    let(:options) {{ a: 0x02 }}
 
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
+    its(:clock) { should == 1 }
+    its(:pc) { should == 0x0001 }
+    specify { cpu.should have_only_flags }
 
+    it "rotates the bits of the A register to the right" do
       cpu.a.should == 0x01
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_false
-      cpu.pc.should == 0x0001
-      cpu.clock.should == 1
     end
 
-    it "should load the bit 0 into the C flag" do
-      cpu = CPU.new(a:0x7F)
+    context "when there is carry" do
+      let(:options) {{ a: 0x7F }}
 
-      cpu.load_with(0x0F).step
-
-      [:b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
-      cpu.a.should == 0xBF
-      cpu.z_flag.should be_false
-      cpu.n_flag.should be_false
-      cpu.h_flag.should be_false
-      cpu.c_flag.should be_true
-      cpu.pc.should == 0x0001
-      cpu.clock.should == 1
+      its(:a) { should == 0xBF }
+      specify { cpu.should have_only_flags :c }
     end
   end
 end
