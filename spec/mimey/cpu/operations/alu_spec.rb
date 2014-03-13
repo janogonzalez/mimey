@@ -1,10 +1,6 @@
-require 'rspec'
-require 'mimey'
 require 'spec_helper'
 
-describe "CPU arithmetic/logical operations" do
-  include Mimey
-
+describe Mimey::CPU do
   describe "INC RR operations" do
     it "must be 4" do
       cpu = CPU.new
