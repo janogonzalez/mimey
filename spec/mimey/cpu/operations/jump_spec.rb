@@ -1,41 +1,35 @@
-require 'rspec'
-require 'mimey'
+require 'spec_helper'
 
-describe "CPU jump operations" do
-  include Mimey
+describe Mimey::CPU do
+  subject(:cpu) { Mimey::CPU.new(options) }
+  let(:options) { Mimey::CPU::DEFAULTS }
 
   describe "JR n" do
-    it "should add n to current address and jump to it" do
-      cpu = CPU.new(pc:0x02)
+    let(:options) {{ pc: 0x02 }}
 
-      cpu.load_with(0x00, 0x00, 0x18, 0b0000_0010).step
+    context "when n is positive" do
+      before { cpu.load_with(0x00, 0x00, 0x18, 0b0000_0010).step }
 
-      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
+      its(:clock) { should == 3 }
+
+      it "jumps forward" do
+        cpu.pc.should == 0x05
       end
-
-      cpu.pc.should == 0x05
-      cpu.clock.should == 3
     end
 
-    it "should jump back if n is negative" do
-      cpu = CPU.new(pc:0x02)
+    context "when n is negative" do
+      before { cpu.load_with(0x00, 0x00, 0x18, 0b1111_1101).step }
 
-      cpu.load_with(0x00, 0x00, 0x18, 0b1111_1101).step
+      its(:clock) { should == 3 }
 
-      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
+      it "jumps back" do
+        cpu.pc.should == 0x00
       end
-
-      cpu.pc.should == 0x00
-      cpu.clock.should == 3
     end
   end
 
   describe "JR cc,n" do
     it "should be 4" do
-      cpu = CPU.new
-
       opcodes = [0x20, 0x28, 0x30, 0x38]
 
       [:jr_nz_n, :jr_z_n, :jr_nc_n, :jr_c_n].each_with_index do |m, i|
@@ -50,10 +44,6 @@ describe "CPU jump operations" do
 
       cpu.load_with(0x00, 0x00, 0x28, 0b0000_0010).step
 
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
       cpu.pc.should == 0x05
       cpu.z_flag.should be_true
       cpu.clock.should == 3
@@ -63,10 +53,6 @@ describe "CPU jump operations" do
       cpu = CPU.new(pc:0x02)
 
       cpu.load_with(0x00, 0x00, 0x20, 0b0000_0010).step
-
-      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
 
       cpu.pc.should == 0x05
       cpu.z_flag.should be_false
@@ -78,10 +64,6 @@ describe "CPU jump operations" do
 
       cpu.load_with(0x00, 0x00, 0x28, 0b0000_0010).step
 
-      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
       cpu.pc.should == 0x04
       cpu.clock.should == 2
     end
@@ -90,10 +72,6 @@ describe "CPU jump operations" do
       cpu = CPU.new(pc:0x02, f:CPU::Z_FLAG)
 
       cpu.load_with(0x00, 0x00, 0x20, 0b0000_0010).step
-
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
 
       cpu.pc.should == 0x04
       cpu.z_flag.should be_true
@@ -105,10 +83,6 @@ describe "CPU jump operations" do
 
       cpu.load_with(0x00, 0x00, 0x28, 0b1111_1101).step
 
-      [:a, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
-
       cpu.pc.should == 0x00
       cpu.z_flag.should be_true
       cpu.clock.should == 3
@@ -118,10 +92,6 @@ describe "CPU jump operations" do
       cpu = CPU.new(pc:0x02)
 
       cpu.load_with(0x00, 0x00, 0x20, 0b1111_1101).step
-
-      [:a, :f, :b, :c, :d, :e, :h, :l, :sp].each do |r|
-        cpu.instance_variable_get("@#{r}").should == 0x00
-      end
 
       cpu.pc.should == 0x00
       cpu.clock.should == 3
