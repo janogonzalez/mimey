@@ -1,6 +1,8 @@
-# Mimey
+**WARNING**: This project is unmaintained, check [eljojo's Fork][fork]!
 
-**WARNING**: This project is unmaintained.
+[fork]: https://github.com/eljojo/mimey
+
+# Mimey
 
 A [Game Boy][gameboy] emulator written in Ruby.
 
