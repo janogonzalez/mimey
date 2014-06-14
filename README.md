@@ -1,5 +1,7 @@
 # Mimey
 
+**WARNING**: This project is unmaintained.
+
 A [Game Boy][gameboy] emulator written in Ruby.
 
 [gameboy]: http://en.wikipedia.org/wiki/Game_Boy
